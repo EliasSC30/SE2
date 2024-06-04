@@ -17,7 +17,7 @@ public class MoneyValueFactory {
             return MoneyValue.INVALID_MONEY_VALUE;
         }
 
-        return new MoneyValue(amount, currency);
+        return new MoneyValue(Converter.roundTwoPlaces(amount), currency);
     }
 
     public static MoneyValue createMoneyValue(String str)

@@ -8,7 +8,7 @@ public class MoneyValue {
 
     MoneyValue(double amount, Currency currency)
     {
-        this.amount = amount;
+        this.amount = Converter.roundTwoPlaces(amount);
         this.currency = currency;
     }
 
@@ -181,7 +181,9 @@ public class MoneyValue {
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
 
-        return new MoneyValue(thisNeutral.getAmount() + otherNeutral.getAmount(), NEUTRAL_CURRENCY);
+        return new MoneyValue(
+                    Converter.roundTwoPlaces(thisNeutral.getAmount() + otherNeutral.getAmount()),
+                    NEUTRAL_CURRENCY);
     }
 
     private MoneyValue neutralSubtract(MoneyValue other)
@@ -192,7 +194,9 @@ public class MoneyValue {
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
 
-        return new MoneyValue(thisNeutral.getAmount() - otherNeutral.getAmount(), NEUTRAL_CURRENCY);
+        return new MoneyValue(
+                    Converter.roundTwoPlaces(thisNeutral.getAmount() - otherNeutral.getAmount()),
+                    NEUTRAL_CURRENCY);
     }
 
     private MoneyValue neutralMultiply(MoneyValue other)
@@ -203,7 +207,9 @@ public class MoneyValue {
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
 
-        return new MoneyValue(thisNeutral.getAmount() * otherNeutral.getAmount(), NEUTRAL_CURRENCY);
+        return new MoneyValue(
+                    Converter.roundTwoPlaces(thisNeutral.getAmount() * otherNeutral.getAmount()),
+                    NEUTRAL_CURRENCY);
     }
 
     private MoneyValue neutralDivide(MoneyValue other)

@@ -83,4 +83,16 @@ class MoneyValueTest {
     @org.junit.jupiter.api.Test
     void testDivide() {
     }
+
+    @org.junit.jupiter.api.Test
+    void testConcatenation() {
+        double expAmount = 1.0;
+
+        MoneyValue mv = new MoneyValue(0.1, MoneyValue.Currency.Dollar);
+        for(int i = 0; i < 9; ++i)
+        {
+            mv = mv.add(new MoneyValue(0.1, MoneyValue.Currency.Dollar));
+        }
+        assertEquals(expAmount, mv.getAmount());
+    }
 }

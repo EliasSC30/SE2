@@ -76,7 +76,6 @@ public class Converter {
         int endOfDigitsIndex = nextWhiteSpaceIndex(str, index);
 
         double unroundedAmount = Double.parseDouble(str.substring(startOfDigitsIndex, endOfDigitsIndex));
-        double amount = roundTwoPlaces(unroundedAmount);
 
         index = nextNonWhiteSpaceIndex(str, endOfDigitsIndex);
 
@@ -90,7 +89,7 @@ public class Converter {
         if(index + 1 <= str.length())
             return MoneyValueFactory.INVALID_MONEY_VALUE;
 
-        return new MoneyValue(amount, currency);
+        return new MoneyValue(roundTwoPlaces(unroundedAmount), currency);
     }
 
     public static double roundTwoPlaces(double amount)
