@@ -111,5 +111,32 @@ class MoneyValueTest {
         assertEquals(expMulAmount, mvMulResult.getAmount());
         assertEquals(expDivAmount, mvDivResult.getAmount());
 
+
+        MoneyValue stressAddSubMv = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
+
+        int nrOfAdditionsAndSubtractions = 1_000_000;
+        for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
+            stressAddSubMv = stressAddSubMv.add(new MoneyValue(0.1, MoneyValue.Currency.Dollar));
+        assertEquals(stressAddSubMv.getAmount(), 100_000);
+
+        for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
+            stressAddSubMv = stressAddSubMv.subtract(new MoneyValue(0.1, MoneyValue.Currency.Dollar));
+
+        assertEquals(stressAddSubMv.getAmount(), 0.0);
+
+
+        MoneyValue stressMulDivMv = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+
+        int nrOfMultAndDivs = 30;
+        for(int i = 0; i < nrOfMultAndDivs; ++i)
+            stressMulDivMv = stressMulDivMv.multiply(new MoneyValue(2.0, MoneyValue.Currency.Dollar));
+        assertEquals(stressMulDivMv.getAmount(), (1 << nrOfMultAndDivs));
+
+        for(int i = 0; i < nrOfMultAndDivs; ++i)
+            stressMulDivMv = stressMulDivMv.divide(new MoneyValue(2.0, MoneyValue.Currency.Dollar));
+
+
+        assertEquals(stressMulDivMv.getAmount(), 1.0);
+
     }
 }
