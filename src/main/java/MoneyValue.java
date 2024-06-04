@@ -59,7 +59,7 @@ public class MoneyValue {
         if(this.currency == Currency.InvalidCurrency)
             return INVALID_MONEY_VALUE_AS_STRING;
 
-        return amount + " " + Converter.CURRENCY_TO_ISO.get(currency);
+        return Converter.roundTwoPlaces(amount) + " " + Converter.CURRENCY_TO_ISO.get(currency);
     }
 
     public String toISOCodePrefix()
@@ -67,7 +67,7 @@ public class MoneyValue {
         if(this.currency == Currency.InvalidCurrency)
             return INVALID_MONEY_VALUE_AS_STRING;
 
-        return Converter.CURRENCY_TO_ISO.get(currency) + " " + amount;
+        return Converter.CURRENCY_TO_ISO.get(currency) + " " + Converter.roundTwoPlaces(amount);
     }
 
     public int compareTo(MoneyValue other)
