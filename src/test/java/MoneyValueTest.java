@@ -88,12 +88,12 @@ class MoneyValueTest {
     void testConcatenation() {
         double expAddAmount = 2.0;
         double expSubAmount = 0.0;
-        double expMultAmount = 0.0;
+        double expMulAmount = 0.0;
         double expDivAmount = 1e10;
 
         MoneyValue mvAddResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
         MoneyValue mvSubResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue mvMultResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue mvMulResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
         MoneyValue mvDivResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
 
         MoneyValue mvConst = new MoneyValue(0.1, MoneyValue.Currency.Dollar);
@@ -102,13 +102,13 @@ class MoneyValueTest {
         {
             mvAddResult = mvAddResult.add(mvConst);
             mvSubResult = mvSubResult.subtract(mvConst);
-            mvMultResult = mvMultResult.multiply(mvConst);
+            mvMulResult = mvMulResult.multiply(mvConst);
             mvDivResult = mvDivResult.divide(mvConst);
         }
 
         assertEquals(expAddAmount, mvAddResult.getAmount());
         assertEquals(expSubAmount, mvSubResult.getAmount());
-        assertEquals(expMultAmount, mvMultResult.getAmount());
+        assertEquals(expMulAmount, mvMulResult.getAmount());
         assertEquals(expDivAmount, mvDivResult.getAmount());
 
     }
