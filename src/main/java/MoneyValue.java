@@ -30,7 +30,7 @@ public class MoneyValue {
         if(this.currency == Currency.InvalidCurrency)
             return INVALID_MONEY_VALUE_AS_STRING;
 
-        return amount + " " + Converter.CURRENCY_TO_SYMBOL.get(currency);
+        return Converter.roundTwoPlaces(amount) + " " + Converter.CURRENCY_TO_SYMBOL.get(currency);
     }
 
     public String toStringPrefix()
@@ -38,7 +38,7 @@ public class MoneyValue {
         if(this.currency == Currency.InvalidCurrency)
             return INVALID_MONEY_VALUE_AS_STRING;
 
-        return Converter.CURRENCY_TO_SYMBOL.get(currency)+ " " + amount;
+        return Converter.CURRENCY_TO_SYMBOL.get(currency)+ " " + Converter.roundTwoPlaces(amount);
     }
 
     @Override
