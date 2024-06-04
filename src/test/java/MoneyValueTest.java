@@ -86,13 +86,31 @@ class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
     void testConcatenation() {
-        double expAmount = 1.0;
+        double expAddAmount = 2.0;
+        double expSubAmount = 0.0;
+        double expMultAmount = 0.0;
+        double expDivAmount = 1e10;
 
-        MoneyValue mv = new MoneyValue(0.1, MoneyValue.Currency.Dollar);
-        for(int i = 0; i < 9; ++i)
+        MoneyValue mvAddResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue mvSubResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue mvMultResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue mvDivResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+
+        MoneyValue mvConst = new MoneyValue(0.1, MoneyValue.Currency.Dollar);
+
+        for(int i = 0; i < 10; ++i)
         {
-            mv = mv.add(new MoneyValue(0.1, MoneyValue.Currency.Dollar));
+            mvAddResult = mvAddResult.add(mvConst);
+            mvSubResult = mvSubResult.subtract(mvConst);
+            mvMultResult = mvMultResult.multiply(mvConst);
+            mvDivResult = mvDivResult.divide(mvConst);
         }
-        assertEquals(expAmount, mv.getAmount());
+
+        assertEquals(expAddAmount, mvAddResult.getAmount());
+        assertEquals(expSubAmount, mvSubResult.getAmount());
+        assertEquals(expMultAmount, mvMultResult.getAmount());
+        assertEquals(expDivAmount, mvDivResult.getAmount());
+
+
     }
 }
