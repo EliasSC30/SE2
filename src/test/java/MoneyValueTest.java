@@ -111,6 +111,5 @@ class MoneyValueTest {
         assertEquals(expMultAmount, mvMultResult.getAmount());
         assertEquals(expDivAmount, mvDivResult.getAmount());
 
-
     }
 }
