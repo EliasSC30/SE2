@@ -69,7 +69,7 @@ public class Converter {
 
     public static MoneyValue stringToMoneyValue(String str) {
         if(str == null || str.equals(""))
-            return MoneyValueFactory.INVALID_MONEY_VALUE;
+            return MoneyValue.INVALID_MONEY_VALUE;
 
         int index = 0;
         int startOfDigitsIndex = nextNonWhiteSpaceIndex(str, index);
@@ -80,19 +80,19 @@ public class Converter {
              unroundedAmount = Double.parseDouble(str.substring(startOfDigitsIndex, endOfDigitsIndex));
         } catch (NumberFormatException e)
         {
-            return MoneyValueFactory.INVALID_MONEY_VALUE;
+            return MoneyValue.INVALID_MONEY_VALUE;
         }
         index = nextNonWhiteSpaceIndex(str, endOfDigitsIndex);
 
         char currencySymbol = str.charAt(index++);
         MoneyValue.Currency currency = symbolToCurrency(currencySymbol);
         if(currency == MoneyValue.Currency.InvalidCurrency)
-            return MoneyValueFactory.INVALID_MONEY_VALUE;
+            return MoneyValue.INVALID_MONEY_VALUE;
 
         index = nextNonWhiteSpaceIndex(str, index);
 
         if(index + 1 <= str.length())
-            return MoneyValueFactory.INVALID_MONEY_VALUE;
+            return MoneyValue.INVALID_MONEY_VALUE;
 
         return new MoneyValue(roundTwoPlaces(unroundedAmount), currency);
     }

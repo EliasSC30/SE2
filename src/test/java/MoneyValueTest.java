@@ -117,6 +117,12 @@ class MoneyValueTest {
         assertEquals(2.0, onePound.add(onePound).getAmount());
         final double onePoundInDollarRounded = Converter.roundTwoPlaces(1.28);
         assertEquals(Converter.roundTwoPlaces(onePoundInDollarRounded + 1.0), oneDollar.add(onePound).getAmount());
+
+        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
+
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.add(oneDollar));
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.add(invalid));
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.add(invalid));
     }
 
     @org.junit.jupiter.api.Test

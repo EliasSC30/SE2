@@ -1,7 +1,6 @@
 public class MoneyValueFactory {
     private static final String INVALID_AMOUNT_MSG = "Invalid amount";
     private static final String INVALID_CURRENCY_MSG = "Invalid currency";
-    public static final MoneyValue INVALID_MONEY_VALUE = new MoneyValue(0, MoneyValue.Currency.InvalidCurrency);
 
     public static MoneyValue createMoneyValue(double amount, MoneyValue.Currency currency)
     {
