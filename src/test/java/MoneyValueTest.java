@@ -109,10 +109,16 @@ class MoneyValueTest {
     @org.junit.jupiter.api.Test
     void add() {
         MoneyValue oneDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue minusOneDollar = new MoneyValue(-1.0, MoneyValue.Currency.Dollar);
         MoneyValue onePound = new MoneyValue(1.0, MoneyValue.Currency.Pound);
 
         assertEquals(2.0, oneDollar.add(oneDollar).getAmount());
         assertEquals(2.0, onePound.add(onePound).getAmount());
+        assertEquals(0.0, oneDollar.add(minusOneDollar).getAmount());
+        assertEquals(0.0, minusOneDollar.add(oneDollar).getAmount());
+
+        assertEquals(Converter.roundTwoPlaces(2.0 * 1.28), onePound.add(onePound, MoneyValue.Currency.Dollar).getAmount());
+        assertEquals(MoneyValue.Currency.Dollar, onePound.add(onePound, MoneyValue.Currency.Dollar).getCurrency());
 
         assertEquals(2.0, onePound.add(onePound).getAmount());
         final double onePoundInDollarRounded = Converter.roundTwoPlaces(1.28);
@@ -131,6 +137,27 @@ class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
     void subtract() {
+        MoneyValue oneDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue minusOneDollar = new MoneyValue(-1.0, MoneyValue.Currency.Dollar);
+        MoneyValue onePound = new MoneyValue(1.0, MoneyValue.Currency.Pound);
+
+        assertEquals(0.0, oneDollar.subtract(oneDollar).getAmount());
+        assertEquals(0.0, onePound.subtract(onePound).getAmount());
+        assertEquals(2.0, oneDollar.subtract(minusOneDollar).getAmount());
+        assertEquals(-2.0, minusOneDollar.subtract(oneDollar).getAmount());
+
+        assertEquals(-2.28, minusOneDollar.subtract(onePound, MoneyValue.Currency.Dollar).getAmount());
+        assertEquals(MoneyValue.Currency.Dollar, onePound.subtract(onePound, MoneyValue.Currency.Dollar).getCurrency());
+
+        assertEquals(0.0, onePound.subtract(onePound).getAmount());
+        final double onePoundInDollarRounded = Converter.roundTwoPlaces(1.28);
+        assertEquals(Converter.roundTwoPlaces(onePoundInDollarRounded - 1.0), onePound.subtract(oneDollar).getAmount());
+
+        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
+
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.subtract(oneDollar));
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.subtract(invalid));
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.subtract(invalid));
     }
 
     @org.junit.jupiter.api.Test
