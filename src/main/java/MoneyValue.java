@@ -97,6 +97,9 @@ public class MoneyValue {
 
     public MoneyValue add(MoneyValue other)
     {
+        if(this.currency == other.getCurrency())
+            return this.add(other, this.currency);
+
         return this.add(other, NEUTRAL_CURRENCY);
     }
 
