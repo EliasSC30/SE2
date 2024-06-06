@@ -8,16 +8,20 @@ class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
     void getCurrency() {
+        MoneyValue mv = new MoneyValue(1.0, MoneyValue.Currency.Euro);
+        assertEquals(mv.getCurrency(), MoneyValue.Currency.Euro);
     }
 
     @org.junit.jupiter.api.Test
     void getAmount() {
+        MoneyValue mv = new MoneyValue(1.0);
+        assertEquals(1.0, mv.getAmount());
     }
 
     @org.junit.jupiter.api.Test
     void testToString() {
-        String expected = "100.0 $";
-        MoneyValue mv = new MoneyValue(100, MoneyValue.Currency.Dollar);
+        String expected = "100.0 €";
+        MoneyValue mv = new MoneyValue(100, MoneyValue.Currency.Euro);
         assertEquals(expected, mv.toString());
     }
 
@@ -30,6 +34,9 @@ class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
     void testEquals() {
+        MoneyValue mv = new MoneyValue(1.0);
+        Object failO = new Object();
+
     }
 
     @org.junit.jupiter.api.Test
@@ -91,12 +98,12 @@ class MoneyValueTest {
         double expMulAmount = 0.0;
         double expDivAmount = 1e10;
 
-        MoneyValue mvAddResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue mvSubResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue mvMulResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue mvDivResult = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue mvAddResult = new MoneyValue(1.0);
+        MoneyValue mvSubResult = new MoneyValue(1.0);
+        MoneyValue mvMulResult = new MoneyValue(1.0);
+        MoneyValue mvDivResult = new MoneyValue(1.0);
 
-        MoneyValue mvConst = new MoneyValue(0.1, MoneyValue.Currency.Dollar);
+        MoneyValue mvConst = new MoneyValue(0.1);
 
         for(int i = 0; i < 10; ++i)
         {
@@ -112,28 +119,28 @@ class MoneyValueTest {
         assertEquals(expDivAmount, mvDivResult.getAmount());
 
 
-        MoneyValue stressAddSubMv = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
+        MoneyValue stressAddSubMv = new MoneyValue(0.0);
 
         int nrOfAdditionsAndSubtractions = 1_000_000;
         for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
-            stressAddSubMv = stressAddSubMv.add(new MoneyValue(0.1, MoneyValue.Currency.Dollar));
+            stressAddSubMv = stressAddSubMv.add(new MoneyValue(0.1));
         assertEquals(stressAddSubMv.getAmount(), 100_000);
 
         for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
-            stressAddSubMv = stressAddSubMv.subtract(new MoneyValue(0.1, MoneyValue.Currency.Dollar));
+            stressAddSubMv = stressAddSubMv.subtract(new MoneyValue(0.1));
 
         assertEquals(stressAddSubMv.getAmount(), 0.0);
 
 
-        MoneyValue stressMulDivMv = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue stressMulDivMv = new MoneyValue(1.0);
 
         int nrOfMultAndDivs = 30;
         for(int i = 0; i < nrOfMultAndDivs; ++i)
-            stressMulDivMv = stressMulDivMv.multiply(new MoneyValue(2.0, MoneyValue.Currency.Dollar));
+            stressMulDivMv = stressMulDivMv.multiply(new MoneyValue(2.0));
         assertEquals(stressMulDivMv.getAmount(), (1 << nrOfMultAndDivs));
 
         for(int i = 0; i < nrOfMultAndDivs; ++i)
-            stressMulDivMv = stressMulDivMv.divide(new MoneyValue(2.0, MoneyValue.Currency.Dollar));
+            stressMulDivMv = stressMulDivMv.divide(new MoneyValue(2.0));
 
 
         assertEquals(stressMulDivMv.getAmount(), 1.0);

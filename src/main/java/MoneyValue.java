@@ -12,6 +12,12 @@ public class MoneyValue {
         this.currency = currency;
     }
 
+    MoneyValue(double amount)
+    {
+        this.amount = Converter.roundTwoPlaces(amount);
+        this.currency = NEUTRAL_CURRENCY;
+    }
+
     public void print()
     {
         System.out.println(this);
