@@ -20,9 +20,13 @@ class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
     void testToString() {
-        String expected = "100.0 €";
-        MoneyValue mv = new MoneyValue(100, MoneyValue.Currency.Euro);
-        assertEquals(expected, mv.toString());
+        String expectedResult = "100.0 €";
+        MoneyValue result = new MoneyValue(100, MoneyValue.Currency.Euro);
+        assertEquals(expectedResult, result.toString());
+
+        String expectedFail = "0xdeadbeef";
+        MoneyValue failed = Converter.stringToMoneyValue(expectedFail);
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE_AS_STRING, failed.toString());
     }
 
     @org.junit.jupiter.api.Test

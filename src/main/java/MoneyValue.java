@@ -4,7 +4,7 @@ public class MoneyValue {
     private final double amount;
     private final Currency currency;
     public static final MoneyValue INVALID_MONEY_VALUE = new MoneyValue(0, Currency.InvalidCurrency);
-    private static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
+    public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
 
     MoneyValue(double amount, Currency currency)
     {

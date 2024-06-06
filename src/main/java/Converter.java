@@ -75,8 +75,13 @@ public class Converter {
         int startOfDigitsIndex = nextNonWhiteSpaceIndex(str, index);
         int endOfDigitsIndex = nextWhiteSpaceIndex(str, index);
 
-        double unroundedAmount = Double.parseDouble(str.substring(startOfDigitsIndex, endOfDigitsIndex));
-
+        double unroundedAmount;
+        try {
+             unroundedAmount = Double.parseDouble(str.substring(startOfDigitsIndex, endOfDigitsIndex));
+        } catch (NumberFormatException e)
+        {
+            return MoneyValueFactory.INVALID_MONEY_VALUE;
+        }
         index = nextNonWhiteSpaceIndex(str, endOfDigitsIndex);
 
         char currencySymbol = str.charAt(index++);
