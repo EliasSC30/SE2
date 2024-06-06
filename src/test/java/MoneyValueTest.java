@@ -3,10 +3,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
-    void print() {
-    }
-
-    @org.junit.jupiter.api.Test
     void getCurrency() {
         MoneyValue mv = new MoneyValue(1.0, MoneyValue.Currency.Euro);
         assertEquals(mv.getCurrency(), MoneyValue.Currency.Euro);
@@ -173,6 +169,7 @@ class MoneyValueTest {
         assertEquals(1.64, onePound.multiply(onePound).getAmount());
         assertEquals(-1.0, oneDollar.multiply(minusOneDollar).getAmount());
         assertEquals(-1.0, minusOneDollar.multiply(oneDollar).getAmount());
+        assertEquals(1.0, minusOneDollar.multiply(minusOneDollar).getAmount());
 
         assertEquals(1.64,
                      onePound.multiply(onePound, MoneyValue.Currency.Dollar).getAmount());
@@ -194,6 +191,30 @@ class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
     void divide() {
+        MoneyValue oneDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+        MoneyValue minusOneDollar = new MoneyValue(-1.0, MoneyValue.Currency.Dollar);
+        MoneyValue onePound = new MoneyValue(1.0, MoneyValue.Currency.Pound);
+
+        assertEquals(1.0, oneDollar.divide(oneDollar).getAmount());
+        assertEquals(1.0, onePound.divide(onePound).getAmount());
+        assertEquals(-1.0, oneDollar.divide(minusOneDollar).getAmount());
+        assertEquals(-1.0, minusOneDollar.divide(oneDollar).getAmount());
+        assertEquals(-1.0, oneDollar.divide(minusOneDollar).getAmount());
+
+        assertEquals(1.0,
+                onePound.divide(onePound, MoneyValue.Currency.Dollar).getAmount());
+        assertEquals(MoneyValue.Currency.Dollar,
+                onePound.divide(onePound, MoneyValue.Currency.Dollar).getCurrency());
+
+        assertEquals(Converter.roundTwoPlaces(1.0/1.28), oneDollar.divide(onePound).getAmount());
+
+        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
+
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.divide(oneDollar));
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.divide(invalid));
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.divide(invalid));
+        final MoneyValue zeroValue = new MoneyValue(0.0);
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.divide(zeroValue));
     }
 
     @org.junit.jupiter.api.Test

@@ -18,11 +18,6 @@ public class MoneyValue {
         this.currency = NEUTRAL_CURRENCY;
     }
 
-    public void print()
-    {
-        System.out.println(this);
-    }
-
     public Currency getCurrency(){
         return this.currency;
     }
