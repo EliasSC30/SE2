@@ -38,17 +38,36 @@ class MoneyValueTest {
 
     @org.junit.jupiter.api.Test
     void testEquals() {
-        MoneyValue mv = new MoneyValue(1.0);
+        MoneyValue mv = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
         Object failO = new Object();
+        MoneyValue otherAmount = new MoneyValue(2.0);
+        MoneyValue otherCurrency = new MoneyValue(1.0, MoneyValue.Currency.Euro);
+        MoneyValue equal = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
 
+
+        assertNotEquals(mv, failO);
+        assertNotEquals(mv, otherAmount);
+        assertNotEquals(mv, otherCurrency);
+
+        assertEquals(mv, equal);
     }
 
     @org.junit.jupiter.api.Test
     void toISOCode() {
+        String expectedISOCode = "100.0 EUR";
+        MoneyValue mv = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+
+        assertEquals(expectedISOCode, mv.toISOCode());
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE_AS_STRING, MoneyValue.INVALID_MONEY_VALUE.toISOCode());
     }
 
     @org.junit.jupiter.api.Test
     void toISOCodePrefix() {
+        String expectedISOCode = "JPY 100.0";
+        MoneyValue mv = new MoneyValue(100.0, MoneyValue.Currency.JapaneseYen);
+
+        assertEquals(expectedISOCode, mv.toISOCodePrefix());
+        assertEquals(MoneyValue.INVALID_MONEY_VALUE_AS_STRING, MoneyValue.INVALID_MONEY_VALUE.toISOCodePrefix());
     }
 
     @org.junit.jupiter.api.Test
