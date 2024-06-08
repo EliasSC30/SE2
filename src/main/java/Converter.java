@@ -1,8 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Converter {
-    public static final double INVALID_CONVERSION_FACTOR = Double.NaN;
     public static final Map<Character, MoneyValue.Currency> SYMBOL_TO_CURRENCY = new HashMap<>(Map.of(
             '$', MoneyValue.Currency.Dollar,
             '€', MoneyValue.Currency.Euro,
@@ -34,12 +35,20 @@ public class Converter {
             MoneyValue.Currency.Pound, 1.28
     ));
 
+    public static class InvalidConversionException extends RuntimeException {
+        public InvalidConversionException(String message) {
+            super(message);
+        }
+    }
+
     static double getConversionFactor(MoneyValue.Currency from, MoneyValue.Currency to)
     {
-        if(from == null || from == MoneyValue.Currency.InvalidCurrency)
-            return INVALID_CONVERSION_FACTOR;
-        if(to == null || to == MoneyValue.Currency.InvalidCurrency)
-            return INVALID_CONVERSION_FACTOR;
+        if (from == null ) {
+            throw new InvalidConversionException("Invalid conversion factor: 'from' currency is invalid");
+        }
+        if (to == null) {
+            throw new InvalidConversionException("Invalid conversion factor: 'to' currency is invalid");
+        }
 
         double fromToDollar = CONVERSION_TO_NEUTRAL.get(from);
         double toToDollar = CONVERSION_TO_NEUTRAL.get(to);
@@ -49,8 +58,8 @@ public class Converter {
 
     public static MoneyValue convertToNeutral(MoneyValue mv)
     {
-        if(mv == null || mv.getCurrency() == MoneyValue.Currency.InvalidCurrency)
-            return MoneyValue.INVALID_MONEY_VALUE;
+        if(mv == null)
+            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
         double toNeutralFactor = CONVERSION_TO_NEUTRAL.get(mv.getCurrency());
 
@@ -59,43 +68,67 @@ public class Converter {
 
     public static MoneyValue convertTo(MoneyValue mv, MoneyValue.Currency toCurrency)
     {
-        if(mv == null || !mv.isValid() || toCurrency == MoneyValue.Currency.InvalidCurrency)
-            return MoneyValue.INVALID_MONEY_VALUE;
+        if(mv == null || !mv.isValid())
+            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+
+        if(toCurrency == null)
+            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
         double toFactor = Converter.getConversionFactor(mv.getCurrency(), toCurrency);
 
         return new MoneyValue(roundTwoPlaces(mv.getAmount() * toFactor), toCurrency);
     }
 
+
     public static MoneyValue stringToMoneyValue(String str) {
         if(str == null || str.equals(""))
-            return MoneyValue.INVALID_MONEY_VALUE;
+            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
-        int index = 0;
-        int startOfDigitsIndex = nextNonWhiteSpaceIndex(str, index);
-        int endOfDigitsIndex = lastDigitIndex(str, index);
+        Pattern pattern = Pattern.compile("([\\$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
+        Matcher matcher = pattern.matcher(str);
+
+        String currencyStr;
+        String amountStr;
+
+        if (!matcher.find() || matcher.group(1) == null || matcher.group(2) == null) {
+            pattern = Pattern.compile("([\\d.,]+)\\s*([\\$€¥£]|USD|EUR|JPY|GBP)?");
+            matcher = pattern.matcher(str);
+
+            if (!matcher.find()) {
+                throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            }
+
+            currencyStr = matcher.group(2);
+            amountStr = matcher.group(1);
+        }else{
+            currencyStr = matcher.group(1);
+            amountStr = matcher.group(2);
+        }
+
+
+        MoneyValue.Currency currency;
+        if (currencyStr == null || currencyStr.isEmpty()) {
+            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+        } else if (currencyStr.length() == 3) {
+            currency = isoToCurrency(currencyStr);
+        } else {
+            char currencyChar = currencyStr.charAt(0);
+            currency = symbolToCurrency(currencyChar);
+        }
+
 
         double unroundedAmount;
         try {
-             unroundedAmount = Double.parseDouble(str.substring(startOfDigitsIndex, endOfDigitsIndex + 1));
+             unroundedAmount = Double.parseDouble(amountStr);
         } catch (NumberFormatException e)
         {
-            return MoneyValue.INVALID_MONEY_VALUE;
+            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
         }
-        index = nextNonWhiteSpaceIndex(str, endOfDigitsIndex);
-
-        char currencySymbol = str.charAt(index++);
-        MoneyValue.Currency currency = symbolToCurrency(currencySymbol);
-        if(currency == MoneyValue.Currency.InvalidCurrency)
-            return MoneyValue.INVALID_MONEY_VALUE;
-
-        index = nextNonWhiteSpaceIndex(str, index);
-
-        if(index + 1 <= str.length())
-            return MoneyValue.INVALID_MONEY_VALUE;
 
         return new MoneyValue(roundTwoPlaces(unroundedAmount), currency);
     }
+
+
 
     public static double roundTwoPlaces(double amount)
     {
@@ -108,9 +141,17 @@ public class Converter {
     private static MoneyValue.Currency symbolToCurrency(Character symbol)
     {
         if(!SYMBOL_TO_CURRENCY.containsKey(symbol))
-            return MoneyValue.Currency.InvalidCurrency;
+            throw new MoneyValue.InvalidMoneyValueException("");
 
         return SYMBOL_TO_CURRENCY.get(symbol);
+    }
+
+    private static MoneyValue.Currency isoToCurrency(String iso)
+    {
+        if(!ISO_TO_CURRENCY.containsKey(iso))
+            throw new MoneyValue.InvalidMoneyValueException("");
+
+        return ISO_TO_CURRENCY.get(iso);
     }
 
     private static int nextNonWhiteSpaceIndex(String str, int index)

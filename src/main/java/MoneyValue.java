@@ -1,19 +1,33 @@
 public class MoneyValue {
-    public enum Currency{Euro, Dollar, JapaneseYen, Pound, InvalidCurrency};
+    public enum Currency{Euro, Dollar, JapaneseYen, Pound};
     public static Currency NEUTRAL_CURRENCY = Currency.Dollar;
     private final double amount;
     private final Currency currency;
-    public static final MoneyValue INVALID_MONEY_VALUE = new MoneyValue(Double.NaN, Currency.InvalidCurrency);
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
+
+    public static class InvalidMoneyValueException extends RuntimeException {
+        public InvalidMoneyValueException(String message) {
+            super(message);
+        }
+    }
 
     MoneyValue(double amount, Currency currency)
     {
+        if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        }
+        if (currency == null) {
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        }
         this.amount = Converter.roundTwoPlaces(amount);
         this.currency = currency;
     }
 
     MoneyValue(double amount)
     {
+        if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        }
         this.amount = Converter.roundTwoPlaces(amount);
         this.currency = NEUTRAL_CURRENCY;
     }
@@ -28,17 +42,11 @@ public class MoneyValue {
     @Override
     public String toString()
     {
-        if(!this.isValid())
-            return INVALID_MONEY_VALUE_AS_STRING;
-
         return Converter.roundTwoPlaces(amount) + " " + Converter.CURRENCY_TO_SYMBOL.get(currency);
     }
 
     public String toStringPrefix()
     {
-        if(!this.isValid())
-            return INVALID_MONEY_VALUE_AS_STRING;
-
         return Converter.CURRENCY_TO_SYMBOL.get(currency)+ " " + Converter.roundTwoPlaces(amount);
     }
 
@@ -57,17 +65,11 @@ public class MoneyValue {
 
     public String toISOCode()
     {
-        if(!this.isValid())
-            return INVALID_MONEY_VALUE_AS_STRING;
-
         return Converter.roundTwoPlaces(amount) + " " + Converter.CURRENCY_TO_ISO.get(currency);
     }
 
     public String toISOCodePrefix()
     {
-        if(!this.isValid())
-            return INVALID_MONEY_VALUE_AS_STRING;
-
         return Converter.CURRENCY_TO_ISO.get(currency) + " " + Converter.roundTwoPlaces(amount);
     }
 
@@ -82,7 +84,7 @@ public class MoneyValue {
 
     public boolean isValid()
     {
-        return this.currency != Currency.InvalidCurrency && !Double.isNaN(this.amount) && !Double.isInfinite(this.amount);
+        return !Double.isNaN(this.amount) && !Double.isInfinite(this.amount);
     }
 
     public MoneyValue convertTo(Currency toCurrency)
@@ -98,10 +100,10 @@ public class MoneyValue {
         return this.add(other, NEUTRAL_CURRENCY);
     }
 
-    public MoneyValue add(MoneyValue other, Currency toCurrency)
+    private MoneyValue add(MoneyValue other, Currency toCurrency)
     {
         if(atLeastOneIsInvalid(this, other))
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
@@ -116,13 +118,16 @@ public class MoneyValue {
 
     public MoneyValue subtract(MoneyValue other)
     {
+        if(this.currency == other.getCurrency())
+            return subtract(other, this.currency);
+
         return subtract(other, NEUTRAL_CURRENCY);
     }
 
-    public MoneyValue subtract(MoneyValue other, Currency toCurrency)
+    private MoneyValue subtract(MoneyValue other, Currency toCurrency)
     {
         if(atLeastOneIsInvalid(this, other))
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
@@ -140,10 +145,10 @@ public class MoneyValue {
         return multiply(other, NEUTRAL_CURRENCY);
     }
 
-    public MoneyValue multiply(MoneyValue other, Currency toCurrency)
+    private MoneyValue multiply(MoneyValue other, Currency toCurrency)
     {
         if(atLeastOneIsInvalid(this, other))
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
@@ -161,10 +166,10 @@ public class MoneyValue {
         return divide(other, NEUTRAL_CURRENCY);
     }
 
-    public MoneyValue divide(MoneyValue other, Currency toCurrency)
+    private MoneyValue divide(MoneyValue other, Currency toCurrency)
     {
         if(atLeastOneIsInvalid(this, other) || other.getAmount() == 0.0)
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
@@ -180,7 +185,7 @@ public class MoneyValue {
     private MoneyValue neutralAdd(MoneyValue other)
     {
         if(atLeastOneIsInvalid(this, other))
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
@@ -193,7 +198,7 @@ public class MoneyValue {
     private MoneyValue neutralSubtract(MoneyValue other)
     {
         if(atLeastOneIsInvalid(this, other))
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
@@ -206,7 +211,7 @@ public class MoneyValue {
     private MoneyValue neutralMultiply(MoneyValue other)
     {
         if(atLeastOneIsInvalid(this, other))
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
@@ -219,7 +224,7 @@ public class MoneyValue {
     private MoneyValue neutralDivide(MoneyValue other)
     {
         if(atLeastOneIsInvalid(this, other) || other.getAmount() == 0.0)
-            return INVALID_MONEY_VALUE;
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue thisNeutral = Converter.convertToNeutral(this);
         MoneyValue otherNeutral = Converter.convertToNeutral(other);
