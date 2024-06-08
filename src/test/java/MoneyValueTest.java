@@ -28,8 +28,11 @@ class MoneyValueTest {
     @org.junit.jupiter.api.Test
     void toStringPrefix() {
         String expected = "$ 100.0";
+        String expectedTwo = "$100.0";
+
         MoneyValue mv = new MoneyValue(100, MoneyValue.Currency.Dollar);
         assertEquals(expected, mv.toStringPrefix());
+        assertEquals(expectedTwo, mv.toStringPrefix());
     }
 
     @org.junit.jupiter.api.Test

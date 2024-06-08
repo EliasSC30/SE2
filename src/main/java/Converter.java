@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Converter {
-    public static final double INVALID_CONVERSION_FACTOR = -1.0;
+    public static final double INVALID_CONVERSION_FACTOR = Double.NaN;
     public static final Map<Character, MoneyValue.Currency> SYMBOL_TO_CURRENCY = new HashMap<>(Map.of(
             '$', MoneyValue.Currency.Dollar,
             '€', MoneyValue.Currency.Euro,
@@ -73,11 +73,11 @@ public class Converter {
 
         int index = 0;
         int startOfDigitsIndex = nextNonWhiteSpaceIndex(str, index);
-        int endOfDigitsIndex = nextWhiteSpaceIndex(str, index);
+        int endOfDigitsIndex = lastDigitIndex(str, index);
 
         double unroundedAmount;
         try {
-             unroundedAmount = Double.parseDouble(str.substring(startOfDigitsIndex, endOfDigitsIndex));
+             unroundedAmount = Double.parseDouble(str.substring(startOfDigitsIndex, endOfDigitsIndex + 1));
         } catch (NumberFormatException e)
         {
             return MoneyValue.INVALID_MONEY_VALUE;
@@ -99,6 +99,9 @@ public class Converter {
 
     public static double roundTwoPlaces(double amount)
     {
+        if(Double.isNaN(amount))
+            return Double.NaN;
+
         return Math.round(amount * 100) / 100.0;
     }
 
@@ -117,10 +120,13 @@ public class Converter {
         return index;
     }
 
-    private static int nextWhiteSpaceIndex(String str, int index)
+    //Assumes a digit at start index
+    private static int lastDigitIndex(String str, int index)
     {
-        while(index < str.length() && str.charAt(index) != ' ')
+
+        while(index + 1 < str.length() && Character.isDigit(str.charAt(index + 1)))
             ++index;
+
         return index;
     }
 }
