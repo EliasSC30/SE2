@@ -1,230 +1,530 @@
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MoneyValueTest {
 
-    @org.junit.jupiter.api.Test
-    void getCurrency() {
-        MoneyValue mv = new MoneyValue(1.0, MoneyValue.Currency.Euro);
-        assertEquals(mv.getCurrency(), MoneyValue.Currency.Euro);
+    @Nested
+    class testMoneyValueConstructor{
+        @Test
+        public void testMoneyValueConstructorValidValues() {
+            // Given
+            double amount = 100.0;
+            MoneyValue.Currency currency = MoneyValue.Currency.Dollar;
+
+            // When
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+
+            // Then
+            assertEquals(amount, moneyValue.getAmount());
+            assertEquals(currency, moneyValue.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorInvalidAmount() {
+            // Given
+            double amount = Double.NaN;
+            MoneyValue.Currency currency = MoneyValue.Currency.Dollar;
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
+        }
+
+        @Test
+        public void testMoneyValueConstructorNullCurrency() {
+            // Given
+            double amount = 100.0;
+            MoneyValue.Currency currency = null;
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
+        }
+
+        @Test
+        public void testMoneyValueConstructorAmountValidValues() {
+            // Given
+            double amount = 100.0;
+
+            // When
+            MoneyValue moneyValue = new MoneyValue(amount);
+
+            // Then
+            assertEquals(amount, moneyValue.getAmount());
+            assertEquals(MoneyValue.NEUTRAL_CURRENCY, moneyValue.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorAmountInvalidAmount() {
+            // Given
+            double amount = Double.NaN;
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount));
+        }
+
+        @Test
+        public void testMoneyValueConstructorAmountInfiniteAmount() {
+            // Given
+            double amount = Double.POSITIVE_INFINITY;
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount));
+        }
     }
 
-    @org.junit.jupiter.api.Test
-    void getAmount() {
-        MoneyValue mv = new MoneyValue(1.0);
-        assertEquals(1.0, mv.getAmount());
+    @Test
+    public void testGetCurrency() {
+        // Given
+        MoneyValue.Currency expectedCurrency = MoneyValue.Currency.Euro;
+        MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+
+        // When
+        MoneyValue.Currency actualCurrency = moneyValue.getCurrency();
+
+        // Then
+        assertEquals(expectedCurrency, actualCurrency);
     }
 
-    @org.junit.jupiter.api.Test
-    void testToString() {
-        String expectedResult = "100.0 €";
-        MoneyValue result = new MoneyValue(100, MoneyValue.Currency.Euro);
-        assertEquals(expectedResult, result.toString());
+    @Test
+    public void testGetAmount() {
+        // Given
+        double expectedAmount = 100.0;
+        MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
 
-        String expectedFail = "0xdeadbeef";
-        MoneyValue failed = Converter.stringToMoneyValue(expectedFail);
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE_AS_STRING, failed.toString());
+        // When
+        double actualAmount = moneyValue.getAmount();
+
+        // Then
+        assertEquals(expectedAmount, actualAmount, 0.0);
     }
 
-    @org.junit.jupiter.api.Test
-    void toStringPrefix() {
-        String expected = "$ 100.0";
-        String expectedTwo = "$100.0";
+    @Test
+    public void testToStringValid() {
+        // Given
+        double amount = 123.456;
+        MoneyValue.Currency currency = MoneyValue.Currency.Euro;
+        MoneyValue moneyValue = new MoneyValue(amount, currency);
+        String expected = "123.46 €";
 
-        MoneyValue mv = new MoneyValue(100, MoneyValue.Currency.Dollar);
-        assertEquals(expected, mv.toStringPrefix());
-        assertEquals(expectedTwo, mv.toStringPrefix());
+        // When
+        String actual = moneyValue.toString();
+
+        // Then
+        assertEquals(expected, actual);
     }
 
-    @org.junit.jupiter.api.Test
-    void testEquals() {
-        MoneyValue mv = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        Object failO = new Object();
-        MoneyValue otherAmount = new MoneyValue(2.0);
-        MoneyValue otherCurrency = new MoneyValue(1.0, MoneyValue.Currency.Euro);
-        MoneyValue equal = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+    @Test
+    public void testToStringPrefixValid() {
+        // Given
+        double amount = 123.456;
+        MoneyValue.Currency currency = MoneyValue.Currency.Euro;
+        MoneyValue moneyValue = new MoneyValue(amount, currency);
+        String expected = "€ 123.46";
 
+        // When
+        String actual = moneyValue.toStringPrefix();
 
-        assertNotEquals(mv, failO);
-        assertNotEquals(mv, otherAmount);
-        assertNotEquals(mv, otherCurrency);
-
-        assertEquals(mv, equal);
+        // Then
+        assertEquals(expected, actual);
     }
 
-    @org.junit.jupiter.api.Test
-    void toISOCode() {
-        String expectedISOCode = "100.0 EUR";
-        MoneyValue mv = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+    @Test
+    public void testToISOCode() {
+        // Given
+        double amount = 123.456;
+        MoneyValue.Currency currency = MoneyValue.Currency.Euro;
+        MoneyValue moneyValue = new MoneyValue(amount, currency);
+        String expected = "123.46 EUR";
 
-        assertEquals(expectedISOCode, mv.toISOCode());
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE_AS_STRING, MoneyValue.INVALID_MONEY_VALUE.toISOCode());
+        // When
+        String actual = moneyValue.toISOCode();
+
+        // Then
+        assertEquals(expected, actual);
     }
 
-    @org.junit.jupiter.api.Test
-    void toISOCodePrefix() {
-        String expectedISOCode = "JPY 100.0";
-        MoneyValue mv = new MoneyValue(100.0, MoneyValue.Currency.JapaneseYen);
+    @Test
+    public void testToISOCodePrefix() {
+        // Given
+        double amount = 100.0;
+        MoneyValue.Currency currency = MoneyValue.Currency.JapaneseYen;
+        MoneyValue moneyValue = new MoneyValue(amount, currency);
+        String expected = "JPY 100.0";
 
-        assertEquals(expectedISOCode, mv.toISOCodePrefix());
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE_AS_STRING, MoneyValue.INVALID_MONEY_VALUE.toISOCodePrefix());
+        // When
+        String actual = moneyValue.toISOCodePrefix();
+
+        // Then
+        assertEquals(expected, actual);
     }
 
-    @org.junit.jupiter.api.Test
-    void compareTo() {
-        MoneyValue greaterZero = new MoneyValue(1.0);
-        MoneyValue zero = new MoneyValue(0.0);
-        MoneyValue smallerZero = new MoneyValue(-1.0);
+    @Nested
+    class MoneyValueEqualsTest {
+        @Test
+        public void testEqualsSameObject() {
+            // Given
+            MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
 
-        assertTrue(greaterZero.compareTo(zero) > 0 && greaterZero.compareTo(smallerZero) > 0);
-        assertTrue(0 < zero.compareTo(smallerZero) && zero.compareTo(greaterZero) < 0);
-        assertTrue(smallerZero.compareTo(zero) < 0 && smallerZero.compareTo(greaterZero) < 0);
-        assertEquals(0.0, smallerZero.compareTo(smallerZero));
-        assertEquals(0.0, zero.compareTo(zero));
-        assertEquals(0.0, greaterZero.compareTo(greaterZero));
+            // When & Then
+            assertTrue(moneyValue.equals(moneyValue));
+        }
+
+        @Test
+        public void testEqualsDifferentObjects() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+
+            // When & Then
+            assertTrue(moneyValue1.equals(moneyValue2));
+            assertTrue(moneyValue2.equals(moneyValue1));
+        }
+
+        @Test
+        public void testNotEqualsForDifferentAmounts() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(200.0, MoneyValue.Currency.Dollar);
+
+            // When & Then
+            assertFalse(moneyValue1.equals(moneyValue2));
+            assertFalse(moneyValue2.equals(moneyValue1));
+        }
+
+        @Test
+        public void testEqualsForSameAmountsDifferentCurrencies() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = moneyValue1.convertTo(MoneyValue.Currency.Euro);
+
+            // When & Then
+            assertTrue(moneyValue1.equals(moneyValue2));
+            assertTrue(moneyValue2.equals(moneyValue1));
+        }
+
+        @Test
+        public void testNotEqualsForDifferentCurrencies() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+
+            // When & Then
+            assertFalse(moneyValue1.equals(moneyValue2));
+            assertFalse(moneyValue2.equals(moneyValue1));
+        }
     }
 
-    @org.junit.jupiter.api.Test
+  @Nested
+  class MoneyValueCompareToTest {
+
+      @Test
+      public void testCompareToSameObject() {
+          // Given
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+          MoneyValue moneyValue2 = moneyValue1;
+
+          // When & Then
+          assertEquals(0, moneyValue1.compareTo(moneyValue2));
+      }
+
+      @Test
+      public void testCompareToEqualValues() {
+          // Given
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+          MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+
+          // When & Then
+          assertTrue(moneyValue1.compareTo(moneyValue2) != 0);
+      }
+
+      @Test
+      public void testCompareToEqualValuesWithDifferentCurrencies() {
+          // Given
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+          MoneyValue moneyValue2 = moneyValue1.convertTo(MoneyValue.Currency.Euro);
+
+          // When & Then
+          assertEquals(0, moneyValue1.compareTo(moneyValue2));
+      }
+
+
+
+      @Test
+      public void testCompareToGreaterValue() {
+          // Given
+          MoneyValue moneyValue1 = new MoneyValue(200.0, MoneyValue.Currency.Dollar);
+          MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+
+          // When & Then
+          assertTrue(moneyValue1.compareTo(moneyValue2) > 0);
+      }
+
+      @Test
+      public void testCompareToSmallerValue() {
+          // Given
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+          MoneyValue moneyValue2 = new MoneyValue(200.0, MoneyValue.Currency.Euro);
+
+          // When & Then
+          assertTrue(moneyValue1.compareTo(moneyValue2) < 0);
+      }
+  }
+
+    @Test
     void isValid() {
+        // Given
         MoneyValue valid = new MoneyValue(1.0);
-        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
 
+        // When & Then
         assertTrue(valid.isValid());
-        assertFalse(invalid.isValid());
     }
 
-    @org.junit.jupiter.api.Test
-    void convertTo() {
-        MoneyValue mvInDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue mvInEuro = mvInDollar.convertTo(MoneyValue.Currency.Euro);
-        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
+   @Nested
+    public class MoneyValueConvertToTest {
 
-        final double oneDollarInEuroRounded = Converter.roundTwoPlaces(1.0/1.09);
-        assertEquals(mvInEuro.getAmount(), oneDollarInEuroRounded);
+        @Test
+        public void testConvertToSameCurrency() {
+            // Given
+            MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue.Currency toCurrency = MoneyValue.Currency.Dollar;
 
-        MoneyValue invalidConverted = invalid.convertTo(MoneyValue.Currency.Euro);
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalidConverted);
+            // When
+            MoneyValue converted = moneyValue.convertTo(toCurrency);
+
+            // Then
+            assertEquals(moneyValue, converted);
+        }
+
+        @Test
+        public void testConvertToDifferentCurrency() {
+            // Given
+            MoneyValue moneyValue = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
+            MoneyValue.Currency toCurrency = MoneyValue.Currency.Euro;
+            double expected = Converter.roundTwoPlaces(1.0/1.09);
+            // When
+            MoneyValue converted = moneyValue.convertTo(toCurrency);
+
+            // Then
+            assertEquals(expected, converted.getAmount());
+            assertEquals(toCurrency, converted.getCurrency());
+        }
     }
 
-    @org.junit.jupiter.api.Test
-    void add() {
-        MoneyValue oneDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue minusOneDollar = new MoneyValue(-1.0, MoneyValue.Currency.Dollar);
-        MoneyValue onePound = new MoneyValue(1.0, MoneyValue.Currency.Pound);
+    @Nested
+    class MoneyValueAddTest {
 
-        assertEquals(2.0, oneDollar.add(oneDollar).getAmount());
-        assertEquals(2.0, onePound.add(onePound).getAmount());
-        assertEquals(0.0, oneDollar.add(minusOneDollar).getAmount());
-        assertEquals(0.0, minusOneDollar.add(oneDollar).getAmount());
+        @Test
+        public void testAddSameCurrency() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(150.0, MoneyValue.Currency.Dollar);
 
-        assertEquals(Converter.roundTwoPlaces(2.0 * 1.28), onePound.add(onePound, MoneyValue.Currency.Dollar).getAmount());
-        assertEquals(MoneyValue.Currency.Dollar, onePound.add(onePound, MoneyValue.Currency.Dollar).getCurrency());
+            // When
+            MoneyValue result = moneyValue1.add(moneyValue2);
 
-        assertEquals(2.0, onePound.add(onePound).getAmount());
-        assertEquals(2.28, oneDollar.add(onePound).getAmount());
+            // Then
+            assertEquals(expected, result);
+        }
 
-        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
+        @Test
+        public void testAddDifferentCurrencies() {
+            // Given
+            MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
+            MoneyValue moneyValue1 = new MoneyValue(100.0, neutralCurrency);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Euro);
+            MoneyValue expected = moneyValue2.convertTo(neutralCurrency).add(moneyValue1);
 
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.add(oneDollar));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.add(invalid));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.add(invalid));
+            // When
+            MoneyValue result = moneyValue1.add(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testAddNegativeValue() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.Euro);
+            MoneyValue expected = new MoneyValue(50, MoneyValue.Currency.Euro);
+
+            // When
+            MoneyValue result = moneyValue1.add(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
     }
 
-    @org.junit.jupiter.api.Test
-    void testAdd() {
+    @Nested
+    public class MoneyValueSubtractTest {
+
+        @Test
+        public void testSubtractSameCurrency() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
+
+            // When
+            MoneyValue result = moneyValue1.subtract(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testSubtractDifferentCurrencies() {
+            // Given
+            MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
+            MoneyValue moneyValue1 = new MoneyValue(100.0, neutralCurrency);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Euro);
+            MoneyValue expected = moneyValue1.subtract(moneyValue2.convertTo(neutralCurrency));
+
+            // When
+            MoneyValue result = moneyValue1.subtract(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testSubtractNegativeValue() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(150.0, MoneyValue.Currency.Dollar);
+
+            // When
+            MoneyValue result = moneyValue1.subtract(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
     }
 
-    @org.junit.jupiter.api.Test
-    void subtract() {
-        MoneyValue oneDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue minusOneDollar = new MoneyValue(-1.0, MoneyValue.Currency.Dollar);
-        MoneyValue onePound = new MoneyValue(1.0, MoneyValue.Currency.Pound);
+    @Nested
+    public class MoneyValueMultiplyTest {
 
-        assertEquals(0.0, oneDollar.subtract(oneDollar).getAmount());
-        assertEquals(0.0, onePound.subtract(onePound).getAmount());
-        assertEquals(2.0, oneDollar.subtract(minusOneDollar).getAmount());
-        assertEquals(-2.0, minusOneDollar.subtract(oneDollar).getAmount());
+        @Test
+        public void testMultiplySameCurrency() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(10.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
 
-        assertEquals(-2.28, minusOneDollar.subtract(onePound, MoneyValue.Currency.Dollar).getAmount());
-        assertEquals(MoneyValue.Currency.Dollar, onePound.subtract(onePound, MoneyValue.Currency.Dollar).getCurrency());
+            // When
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
 
-        assertEquals(0.0, onePound.subtract(onePound).getAmount());
-        final double onePoundInDollarRounded = Converter.roundTwoPlaces(1.28);
-        assertEquals(Converter.roundTwoPlaces(onePoundInDollarRounded - 1.0), onePound.subtract(oneDollar).getAmount());
+            // Then
+            assertEquals(expected, result);
+        }
 
-        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
+        @Test
+        public void testMultiplyDifferentCurrencies() {
+            // Given
+            MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
+            MoneyValue moneyValue1 = new MoneyValue(10.0, neutralCurrency);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Euro);
+            MoneyValue expected = moneyValue1.multiply(moneyValue2.convertTo(neutralCurrency));
 
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.subtract(oneDollar));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.subtract(invalid));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.subtract(invalid));
+            // When
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testMultiplyNegativeValue() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(-10.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(-50.0, MoneyValue.Currency.Dollar);
+
+            // When
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testMultiplyZeroValue() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
+
+            // When
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
     }
 
-    @org.junit.jupiter.api.Test
-    void testSubtract() {
+    @Nested
+    public class MoneyValueDivideTest {
+
+        @Test
+        public void testDivideSameCurrency() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(2.0, MoneyValue.Currency.Dollar);
+
+            // When
+            MoneyValue result = moneyValue1.divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testDivideDifferentCurrencies() {
+            // Given
+            MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
+            MoneyValue moneyValue1 = new MoneyValue(100.0, neutralCurrency);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Euro);
+            MoneyValue expected = moneyValue1.divide(moneyValue2.convertTo(neutralCurrency));
+
+            // When
+            MoneyValue result = moneyValue1.divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testDivideNegativeValue() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.Dollar);
+            MoneyValue expected = new MoneyValue(-2.0, MoneyValue.Currency.Dollar);
+
+            // When
+            MoneyValue result = moneyValue1.divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, result);
+        }
+
+        @Test
+        public void testDivideZeroValue() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue2 = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));
+        }
     }
 
-    @org.junit.jupiter.api.Test
-    void multiply() {
-        MoneyValue oneDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue minusOneDollar = new MoneyValue(-1.0, MoneyValue.Currency.Dollar);
-        MoneyValue onePound = new MoneyValue(1.0, MoneyValue.Currency.Pound);
-
-        assertEquals(1.0, oneDollar.multiply(oneDollar).getAmount());
-        assertEquals(1.64, onePound.multiply(onePound).getAmount());
-        assertEquals(-1.0, oneDollar.multiply(minusOneDollar).getAmount());
-        assertEquals(-1.0, minusOneDollar.multiply(oneDollar).getAmount());
-        assertEquals(1.0, minusOneDollar.multiply(minusOneDollar).getAmount());
-
-        assertEquals(1.64,
-                     onePound.multiply(onePound, MoneyValue.Currency.Dollar).getAmount());
-        assertEquals(MoneyValue.Currency.Dollar,
-                     onePound.multiply(onePound, MoneyValue.Currency.Dollar).getCurrency());
-
-        assertEquals(1.28, oneDollar.multiply(onePound).getAmount());
-
-        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
-
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.multiply(oneDollar));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.multiply(invalid));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.multiply(invalid));
-    }
-
-    @org.junit.jupiter.api.Test
-    void testMultiply() {
-    }
-
-    @org.junit.jupiter.api.Test
-    void divide() {
-        MoneyValue oneDollar = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-        MoneyValue minusOneDollar = new MoneyValue(-1.0, MoneyValue.Currency.Dollar);
-        MoneyValue onePound = new MoneyValue(1.0, MoneyValue.Currency.Pound);
-
-        assertEquals(1.0, oneDollar.divide(oneDollar).getAmount());
-        assertEquals(1.0, onePound.divide(onePound).getAmount());
-        assertEquals(-1.0, oneDollar.divide(minusOneDollar).getAmount());
-        assertEquals(-1.0, minusOneDollar.divide(oneDollar).getAmount());
-        assertEquals(-1.0, oneDollar.divide(minusOneDollar).getAmount());
-
-        assertEquals(1.0,
-                onePound.divide(onePound, MoneyValue.Currency.Dollar).getAmount());
-        assertEquals(MoneyValue.Currency.Dollar,
-                onePound.divide(onePound, MoneyValue.Currency.Dollar).getCurrency());
-
-        assertEquals(Converter.roundTwoPlaces(1.0/1.28), oneDollar.divide(onePound).getAmount());
-
-        MoneyValue invalid = MoneyValue.INVALID_MONEY_VALUE;
-
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.divide(oneDollar));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.divide(invalid));
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, invalid.divide(invalid));
-        final MoneyValue zeroValue = new MoneyValue(0.0);
-        assertEquals(MoneyValue.INVALID_MONEY_VALUE, oneDollar.divide(zeroValue));
-    }
-
-    @org.junit.jupiter.api.Test
-    void testDivide() {
-    }
-
-    @org.junit.jupiter.api.Test
+    @Test
     void testConcatenation() {
         double expAddAmount = 2.0;
         double expSubAmount = 0.0;
@@ -277,6 +577,5 @@ class MoneyValueTest {
 
 
         assertEquals(stressMulDivMv.getAmount(), 1.0);
-
     }
 }
