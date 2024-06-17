@@ -13,7 +13,7 @@ public class MoneyValue {
 
     MoneyValue(double amount, Currency currency)
     {
-        if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+        if (Double.isNaN(amount) || !amountIsInRange(amount)) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
         if (currency == null) {
@@ -25,7 +25,7 @@ public class MoneyValue {
 
     MoneyValue(double amount)
     {
-        if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+        if (Double.isNaN(amount) || !amountIsInRange(amount)) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
         this.amount = Converter.roundTwoPlaces(amount);
@@ -47,7 +47,7 @@ public class MoneyValue {
 
     public String toStringPrefix()
     {
-        return Converter.CURRENCY_TO_SYMBOL.get(currency)+ " " + Converter.roundTwoPlaces(amount);
+        return Converter.CURRENCY_TO_SYMBOL.get(currency) + " " + Converter.roundTwoPlaces(amount);
     }
 
     @Override
@@ -237,6 +237,13 @@ public class MoneyValue {
     private static boolean atLeastOneIsInvalid(MoneyValue a, MoneyValue b)
     {
         return a == null || b == null || !a.isValid() || !b.isValid();
+    }
+
+    // Double precision has a relative error less than 10^-(15). Thus
+    // values up to 10^(13) will be rounded correctly, up to two places.
+    private static boolean amountIsInRange(double amount)
+    {
+        return (!Double.isNaN(amount) && Math.abs(amount) < 1e13);
     }
 
 }
