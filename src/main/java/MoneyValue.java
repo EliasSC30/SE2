@@ -1,5 +1,4 @@
 public class MoneyValue {
-    public enum Currency{EURO, US_DOLLAR, JAPANESE_YEN, BRITISH_POUND};
     public static Currency NEUTRAL_CURRENCY = Currency.US_DOLLAR;
     private final double amount;
     private final Currency currency;
@@ -42,12 +41,12 @@ public class MoneyValue {
     @Override
     public String toString()
     {
-        return Converter.roundTwoPlaces(amount) + " " + Converter.CURRENCY_TO_SYMBOL.get(currency);
+        return Converter.roundTwoPlaces(amount) + " " + currency.getSymbol();
     }
 
     public String toStringPrefix()
     {
-        return Converter.CURRENCY_TO_SYMBOL.get(currency) + " " + Converter.roundTwoPlaces(amount);
+        return currency.getSymbol() + " " + Converter.roundTwoPlaces(amount);
     }
 
     @Override
@@ -65,12 +64,12 @@ public class MoneyValue {
 
     public String toISOCode()
     {
-        return Converter.roundTwoPlaces(amount) + " " + Converter.CURRENCY_TO_ISO.get(currency);
+        return Converter.roundTwoPlaces(amount) + " " + currency.getIsoCode();
     }
 
     public String toISOCodePrefix()
     {
-        return Converter.CURRENCY_TO_ISO.get(currency) + " " + Converter.roundTwoPlaces(amount);
+        return currency.getIsoCode() + " " + Converter.roundTwoPlaces(amount);
     }
 
     public int compareTo(MoneyValue other)

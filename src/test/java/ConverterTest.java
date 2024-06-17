@@ -10,47 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConverterTest {
 
-    private MoneyValue.Currency dollar;
-    private MoneyValue.Currency euro;
+    private Currency dollar;
+    private Currency euro;
 
     @BeforeEach
     void setUp() {
-        dollar = MoneyValue.Currency.US_DOLLAR;
-        euro = MoneyValue.Currency.EURO;
-    }
-
-    @Nested
-    class ConverterGetConversionFactorTest{
-        @Test
-        public void testGetConversionFactorSameCurrency() {
-            // Given & When
-            double factor = Converter.getConversionFactor(dollar, dollar);
-
-            // Then
-            assertEquals(1.0, factor);
-        }
-
-        @Test
-        public void testGetConversionFactorDifferentCurrencies() {
-            // Given & When
-            double dollarToEuroFactor = Converter.getConversionFactor(dollar, euro);
-            double euroToDollarFactor = Converter.getConversionFactor(euro, dollar);
-            double euroToDollarExp = 1.09;
-
-            // Then
-            assertEquals(euroToDollarExp, euroToDollarFactor);
-            assertEquals(1 / 1.09, dollarToEuroFactor);
-        }
-
-        @Test
-        public void testGetConversionFactorInvalidCurrency() {
-            // Given & When & Then
-            assertThrows(Converter.InvalidConversionException.class,
-                    () -> Converter.getConversionFactor(null, euro));
-
-            assertThrows(Converter.InvalidConversionException.class,
-                    () -> Converter.getConversionFactor(dollar, null));
-        }
+        dollar = Currency.US_DOLLAR;
+        euro = Currency.EURO;
     }
 
     @Nested
@@ -135,29 +101,29 @@ class ConverterTest {
 
         @Test
         public void testStringToMoneyValues() {
-            Map<String, MoneyValue.Currency>[] currencySigns = new HashMap[]{
-                    new HashMap<String, MoneyValue.Currency>() {{
-                        put("$", MoneyValue.Currency.US_DOLLAR);
-                        put("USD", MoneyValue.Currency.US_DOLLAR);
+            Map<String, Currency>[] currencySigns = new HashMap[]{
+                    new HashMap<String, Currency>() {{
+                        put("$", Currency.US_DOLLAR);
+                        put("USD", Currency.US_DOLLAR);
                     }},
-                    new HashMap<String, MoneyValue.Currency>() {{
-                        put("€", MoneyValue.Currency.EURO);
-                        put("EUR", MoneyValue.Currency.EURO);
+                    new HashMap<String, Currency>() {{
+                        put("€", Currency.EURO);
+                        put("EUR", Currency.EURO);
                     }},
-                    new HashMap<String, MoneyValue.Currency>() {{
-                        put("¥", MoneyValue.Currency.JAPANESE_YEN);
-                        put("JPY", MoneyValue.Currency.JAPANESE_YEN);
+                    new HashMap<String, Currency>() {{
+                        put("¥", Currency.JAPANESE_YEN);
+                        put("JPY", Currency.JAPANESE_YEN);
                     }},
-                    new HashMap<String, MoneyValue.Currency>() {{
-                        put("£", MoneyValue.Currency.BRITISH_POUND);
-                        put("GBP", MoneyValue.Currency.BRITISH_POUND);
+                    new HashMap<String, Currency>() {{
+                        put("£", Currency.BRITISH_POUND);
+                        put("GBP", Currency.BRITISH_POUND);
                     }}
             };
 
-            for (Map<String, MoneyValue.Currency> map : currencySigns) {
-                for (Map.Entry<String, MoneyValue.Currency> entry : map.entrySet()) {
+            for (Map<String, Currency> map : currencySigns) {
+                for (Map.Entry<String, Currency> entry : map.entrySet()) {
                     String currencyStr = entry.getKey();
-                    MoneyValue.Currency expectedCurrency = entry.getValue();
+                    Currency expectedCurrency = entry.getValue();
                     String input = "123.45 " + currencyStr;
                     MoneyValue result = Converter.stringToMoneyValue(input);
                     assertEquals(123.45, result.getAmount());

@@ -2,7 +2,7 @@ public class MoneyValueFactory {
     private static final String INVALID_AMOUNT_MSG = "Invalid amount";
 
 
-    public static MoneyValue createMoneyValue(double amount, MoneyValue.Currency currency)
+    public static MoneyValue createMoneyValue(double amount, Currency currency)
     {
         if(!validateAmount(amount))
         {
