@@ -15,7 +15,7 @@ public class MoneyValueFactory {
 
     public static MoneyValue createMoneyValue(String str)
     {
-        MoneyValue ret = Converter.stringToMoneyValue(str);
+        MoneyValue ret = new MoneyValue(str);
         if(!validateAmount(ret.getAmount()))
         {
             System.out.println(INVALID_AMOUNT_MSG);

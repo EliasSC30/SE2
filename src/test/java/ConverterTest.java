@@ -71,68 +71,6 @@ class ConverterTest {
         }
     }
 
-    @Nested
-    class ConverterStringToMoneyValueTest{
-        @Test
-        public void testStringToMoneyValueCurrencyFrontString() {
-            // Given
-            String str = "$ 100.00";
-
-            // When
-            MoneyValue mv = Converter.stringToMoneyValue(str);
-
-            // Then
-            assertEquals(100.0, mv.getAmount());
-            assertEquals(MoneyValue.NEUTRAL_CURRENCY, mv.getCurrency());
-        }
-
-        @Test
-        public void testStringToMoneyValueCurrencyBackString() {
-            // Given
-            String str = "100.0 $";
-
-            // When
-            MoneyValue mv = Converter.stringToMoneyValue(str);
-
-            // Then
-            assertEquals(100.0, mv.getAmount());
-            assertEquals(MoneyValue.NEUTRAL_CURRENCY, mv.getCurrency());
-        }
-
-        @Test
-        public void testStringToMoneyValues() {
-            Map<String, Currency>[] currencySigns = new HashMap[]{
-                    new HashMap<String, Currency>() {{
-                        put("$", Currency.US_DOLLAR);
-                        put("USD", Currency.US_DOLLAR);
-                    }},
-                    new HashMap<String, Currency>() {{
-                        put("€", Currency.EURO);
-                        put("EUR", Currency.EURO);
-                    }},
-                    new HashMap<String, Currency>() {{
-                        put("¥", Currency.JAPANESE_YEN);
-                        put("JPY", Currency.JAPANESE_YEN);
-                    }},
-                    new HashMap<String, Currency>() {{
-                        put("£", Currency.BRITISH_POUND);
-                        put("GBP", Currency.BRITISH_POUND);
-                    }}
-            };
-
-            for (Map<String, Currency> map : currencySigns) {
-                for (Map.Entry<String, Currency> entry : map.entrySet()) {
-                    String currencyStr = entry.getKey();
-                    Currency expectedCurrency = entry.getValue();
-                    String input = "123.45 " + currencyStr;
-                    MoneyValue result = Converter.stringToMoneyValue(input);
-                    assertEquals(123.45, result.getAmount());
-                    assertEquals(expectedCurrency, result.getCurrency());
-                }
-            }
-        }
-    }
-
 
     @Nested
     class ConverterRoundTwoPlacesTest{

@@ -1,6 +1,9 @@
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MoneyValueTest {
@@ -71,6 +74,67 @@ class MoneyValueTest {
             // When & Then
             assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount));
         }
+
+
+            @Test
+            public void testMoneyValueConstructorFrontString() {
+                // Given
+                String str = "$ 100.00";
+
+                // When
+                MoneyValue mv = new MoneyValue(str);
+
+                // Then
+                assertEquals(100.0, mv.getAmount());
+                assertEquals(MoneyValue.NEUTRAL_CURRENCY, mv.getCurrency());
+            }
+
+            @Test
+            public void testMoneyValueConstructorBackString() {
+                // Given
+                String str = "100.0 $";
+
+                // When
+                MoneyValue mv = new MoneyValue(str);
+
+                // Then
+                assertEquals(100.0, mv.getAmount());
+                assertEquals(MoneyValue.NEUTRAL_CURRENCY, mv.getCurrency());
+            }
+
+            @Test
+            public void testStringToMoneyValues() {
+                Map<String, Currency>[] currencySigns = new HashMap[]{
+                        new HashMap<String, Currency>() {{
+                            put("$", Currency.US_DOLLAR);
+                            put("USD", Currency.US_DOLLAR);
+                        }},
+                        new HashMap<String, Currency>() {{
+                            put("€", Currency.EURO);
+                            put("EUR", Currency.EURO);
+                        }},
+                        new HashMap<String, Currency>() {{
+                            put("¥", Currency.JAPANESE_YEN);
+                            put("JPY", Currency.JAPANESE_YEN);
+                        }},
+                        new HashMap<String, Currency>() {{
+                            put("£", Currency.BRITISH_POUND);
+                            put("GBP", Currency.BRITISH_POUND);
+                        }}
+                };
+
+                for (Map<String, Currency> map : currencySigns) {
+                    for (Map.Entry<String, Currency> entry : map.entrySet()) {
+                        String currencyStr = entry.getKey();
+                        Currency expectedCurrency = entry.getValue();
+                        String input = "123.45 " + currencyStr;
+                        MoneyValue result = new MoneyValue(input);
+                        assertEquals(123.45, result.getAmount());
+                        assertEquals(expectedCurrency, result.getCurrency());
+                    }
+                }
+            }
+
     }
 
     @Test

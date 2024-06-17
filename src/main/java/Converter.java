@@ -44,55 +44,6 @@ public class Converter {
     }
 
 
-    public static MoneyValue stringToMoneyValue(String str) {
-        if(str == null || str.equals(""))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
-
-        Pattern pattern = Pattern.compile("([\\$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
-        Matcher matcher = pattern.matcher(str);
-
-        String currencyStr;
-        String amountStr;
-
-        if (!matcher.find() || matcher.group(1) == null || matcher.group(2) == null) {
-            pattern = Pattern.compile("([\\d.,]+)\\s*([\\$€¥£]|USD|EUR|JPY|GBP)?");
-            matcher = pattern.matcher(str);
-
-            if (!matcher.find()) {
-                throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
-            }
-
-            currencyStr = matcher.group(2);
-            amountStr = matcher.group(1);
-        }else{
-            currencyStr = matcher.group(1);
-            amountStr = matcher.group(2);
-        }
-
-
-        Currency currency;
-        if (currencyStr == null || currencyStr.isEmpty()) {
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
-        } else if (currencyStr.length() == 3) {
-            currency = Currency.fromIsoCode(currencyStr);
-        } else {
-            char currencyChar = currencyStr.charAt(0);
-            currency = Currency.fromSymbol(currencyChar);
-        }
-
-
-        double unroundedAmount;
-        try {
-             unroundedAmount = Double.parseDouble(amountStr);
-        } catch (NumberFormatException e)
-        {
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
-        }
-
-        return new MoneyValue(roundTwoPlaces(unroundedAmount), currency);
-    }
-
-
 
     public static double roundTwoPlaces(double amount)
     {
