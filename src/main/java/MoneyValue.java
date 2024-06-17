@@ -93,12 +93,16 @@ public class MoneyValue {
     @Override
     public String toString()
     {
-        return Converter.roundTwoPlaces(amount) + " " + currency.getSymbol();
-    }
+        Double roundedAmount = Converter.roundTwoPlaces(amount);
+        String formattedAmount = String.format("%.2f", roundedAmount);
 
-    public String toStringPrefix()
-    {
-        return currency.getSymbol() + " " + Converter.roundTwoPlaces(amount);
+        if(currency == Currency.EURO){
+            return formattedAmount.replace(".", ",") + " " + currency.getSymbol();
+        } 
+
+        return currency.getSymbol() + " " + formattedAmount;
+
+       
     }
 
     @Override

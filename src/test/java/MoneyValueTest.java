@@ -169,25 +169,10 @@ class MoneyValueTest {
         double amount = 123.456;
         Currency currency = Currency.EURO;
         MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "123.46 €";
+        String expected = "123,46 €";
 
         // When
         String actual = moneyValue.toString();
-
-        // Then
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void testToStringPrefixValid() {
-        // Given
-        double amount = 123.456;
-        Currency currency = Currency.EURO;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "€ 123.46";
-
-        // When
-        String actual = moneyValue.toStringPrefix();
 
         // Then
         assertEquals(expected, actual);
