@@ -11,7 +11,7 @@ class MoneyValueTest {
         public void testMoneyValueConstructorValidValues() {
             // Given
             double amount = 100.0;
-            MoneyValue.Currency currency = MoneyValue.Currency.Dollar;
+            MoneyValue.Currency currency = MoneyValue.Currency.US_DOLLAR;
 
             // When
             MoneyValue moneyValue = new MoneyValue(amount, currency);
@@ -25,7 +25,7 @@ class MoneyValueTest {
         public void testMoneyValueConstructorInvalidAmount() {
             // Given
             double amount = Double.NaN;
-            MoneyValue.Currency currency = MoneyValue.Currency.Dollar;
+            MoneyValue.Currency currency = MoneyValue.Currency.US_DOLLAR;
 
             // When & Then
             assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
@@ -76,8 +76,8 @@ class MoneyValueTest {
     @Test
     public void testGetCurrency() {
         // Given
-        MoneyValue.Currency expectedCurrency = MoneyValue.Currency.Euro;
-        MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+        MoneyValue.Currency expectedCurrency = MoneyValue.Currency.EURO;
+        MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.EURO);
 
         // When
         MoneyValue.Currency actualCurrency = moneyValue.getCurrency();
@@ -90,7 +90,7 @@ class MoneyValueTest {
     public void testGetAmount() {
         // Given
         double expectedAmount = 100.0;
-        MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+        MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
 
         // When
         double actualAmount = moneyValue.getAmount();
@@ -103,7 +103,7 @@ class MoneyValueTest {
     public void testToStringValid() {
         // Given
         double amount = 123.456;
-        MoneyValue.Currency currency = MoneyValue.Currency.Euro;
+        MoneyValue.Currency currency = MoneyValue.Currency.EURO;
         MoneyValue moneyValue = new MoneyValue(amount, currency);
         String expected = "123.46 €";
 
@@ -118,7 +118,7 @@ class MoneyValueTest {
     public void testToStringPrefixValid() {
         // Given
         double amount = 123.456;
-        MoneyValue.Currency currency = MoneyValue.Currency.Euro;
+        MoneyValue.Currency currency = MoneyValue.Currency.EURO;
         MoneyValue moneyValue = new MoneyValue(amount, currency);
         String expected = "€ 123.46";
 
@@ -133,7 +133,7 @@ class MoneyValueTest {
     public void testToISOCode() {
         // Given
         double amount = 123.456;
-        MoneyValue.Currency currency = MoneyValue.Currency.Euro;
+        MoneyValue.Currency currency = MoneyValue.Currency.EURO;
         MoneyValue moneyValue = new MoneyValue(amount, currency);
         String expected = "123.46 EUR";
 
@@ -148,7 +148,7 @@ class MoneyValueTest {
     public void testToISOCodePrefix() {
         // Given
         double amount = 100.0;
-        MoneyValue.Currency currency = MoneyValue.Currency.JapaneseYen;
+        MoneyValue.Currency currency = MoneyValue.Currency.JAPANESE_YEN;
         MoneyValue moneyValue = new MoneyValue(amount, currency);
         String expected = "JPY 100.0";
 
@@ -164,7 +164,7 @@ class MoneyValueTest {
         @Test
         public void testEqualsSameObject() {
             // Given
-            MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
 
             // When & Then
             assertTrue(moneyValue.equals(moneyValue));
@@ -173,8 +173,8 @@ class MoneyValueTest {
         @Test
         public void testEqualsDifferentObjects() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
 
             // When & Then
             assertTrue(moneyValue1.equals(moneyValue2));
@@ -184,8 +184,8 @@ class MoneyValueTest {
         @Test
         public void testNotEqualsForDifferentAmounts() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(200.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(200.0, MoneyValue.Currency.US_DOLLAR);
 
             // When & Then
             assertFalse(moneyValue1.equals(moneyValue2));
@@ -195,8 +195,8 @@ class MoneyValueTest {
         @Test
         public void testEqualsForSameAmountsDifferentCurrencies() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = moneyValue1.convertTo(MoneyValue.Currency.Euro);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = moneyValue1.convertTo(MoneyValue.Currency.EURO);
 
             // When & Then
             assertTrue(moneyValue1.equals(moneyValue2));
@@ -206,8 +206,8 @@ class MoneyValueTest {
         @Test
         public void testNotEqualsForDifferentCurrencies() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.EURO);
 
             // When & Then
             assertFalse(moneyValue1.equals(moneyValue2));
@@ -221,7 +221,7 @@ class MoneyValueTest {
       @Test
       public void testCompareToSameObject() {
           // Given
-          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
           MoneyValue moneyValue2 = moneyValue1;
 
           // When & Then
@@ -231,8 +231,8 @@ class MoneyValueTest {
       @Test
       public void testCompareToEqualValues() {
           // Given
-          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-          MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+          MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.EURO);
 
           // When & Then
           assertTrue(moneyValue1.compareTo(moneyValue2) != 0);
@@ -241,8 +241,8 @@ class MoneyValueTest {
       @Test
       public void testCompareToEqualValuesWithDifferentCurrencies() {
           // Given
-          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-          MoneyValue moneyValue2 = moneyValue1.convertTo(MoneyValue.Currency.Euro);
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+          MoneyValue moneyValue2 = moneyValue1.convertTo(MoneyValue.Currency.EURO);
 
           // When & Then
           assertEquals(0, moneyValue1.compareTo(moneyValue2));
@@ -253,8 +253,8 @@ class MoneyValueTest {
       @Test
       public void testCompareToGreaterValue() {
           // Given
-          MoneyValue moneyValue1 = new MoneyValue(200.0, MoneyValue.Currency.Dollar);
-          MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
+          MoneyValue moneyValue1 = new MoneyValue(200.0, MoneyValue.Currency.US_DOLLAR);
+          MoneyValue moneyValue2 = new MoneyValue(100.0, MoneyValue.Currency.EURO);
 
           // When & Then
           assertTrue(moneyValue1.compareTo(moneyValue2) > 0);
@@ -263,8 +263,8 @@ class MoneyValueTest {
       @Test
       public void testCompareToSmallerValue() {
           // Given
-          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-          MoneyValue moneyValue2 = new MoneyValue(200.0, MoneyValue.Currency.Euro);
+          MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+          MoneyValue moneyValue2 = new MoneyValue(200.0, MoneyValue.Currency.EURO);
 
           // When & Then
           assertTrue(moneyValue1.compareTo(moneyValue2) < 0);
@@ -286,8 +286,8 @@ class MoneyValueTest {
         @Test
         public void testConvertToSameCurrency() {
             // Given
-            MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue.Currency toCurrency = MoneyValue.Currency.Dollar;
+            MoneyValue moneyValue = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue.Currency toCurrency = MoneyValue.Currency.US_DOLLAR;
 
             // When
             MoneyValue converted = moneyValue.convertTo(toCurrency);
@@ -299,8 +299,8 @@ class MoneyValueTest {
         @Test
         public void testConvertToDifferentCurrency() {
             // Given
-            MoneyValue moneyValue = new MoneyValue(1.0, MoneyValue.Currency.Dollar);
-            MoneyValue.Currency toCurrency = MoneyValue.Currency.Euro;
+            MoneyValue moneyValue = new MoneyValue(1.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue.Currency toCurrency = MoneyValue.Currency.EURO;
             double expected = Converter.roundTwoPlaces(1.0/1.09);
             // When
             MoneyValue converted = moneyValue.convertTo(toCurrency);
@@ -317,9 +317,9 @@ class MoneyValueTest {
         @Test
         public void testAddSameCurrency() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(150.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(150.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.add(moneyValue2);
@@ -333,7 +333,7 @@ class MoneyValueTest {
             // Given
             MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
             MoneyValue moneyValue1 = new MoneyValue(100.0, neutralCurrency);
-            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Euro);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.EURO);
             MoneyValue expected = moneyValue2.convertTo(neutralCurrency).add(moneyValue1);
 
             // When
@@ -346,9 +346,9 @@ class MoneyValueTest {
         @Test
         public void testAddNegativeValue() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Euro);
-            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.Euro);
-            MoneyValue expected = new MoneyValue(50, MoneyValue.Currency.Euro);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.EURO);
+            MoneyValue expected = new MoneyValue(50, MoneyValue.Currency.EURO);
 
             // When
             MoneyValue result = moneyValue1.add(moneyValue2);
@@ -365,9 +365,9 @@ class MoneyValueTest {
         @Test
         public void testSubtractSameCurrency() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(50.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.subtract(moneyValue2);
@@ -381,7 +381,7 @@ class MoneyValueTest {
             // Given
             MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
             MoneyValue moneyValue1 = new MoneyValue(100.0, neutralCurrency);
-            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Euro);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.EURO);
             MoneyValue expected = moneyValue1.subtract(moneyValue2.convertTo(neutralCurrency));
 
             // When
@@ -394,9 +394,9 @@ class MoneyValueTest {
         @Test
         public void testSubtractNegativeValue() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(150.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(150.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.subtract(moneyValue2);
@@ -412,9 +412,9 @@ class MoneyValueTest {
         @Test
         public void testMultiplySameCurrency() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(10.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(10.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(50.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.multiply(moneyValue2);
@@ -428,7 +428,7 @@ class MoneyValueTest {
             // Given
             MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
             MoneyValue moneyValue1 = new MoneyValue(10.0, neutralCurrency);
-            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Euro);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.EURO);
             MoneyValue expected = moneyValue1.multiply(moneyValue2.convertTo(neutralCurrency));
 
             // When
@@ -441,9 +441,9 @@ class MoneyValueTest {
         @Test
         public void testMultiplyNegativeValue() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(-10.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(-50.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(-10.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(-50.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.multiply(moneyValue2);
@@ -455,9 +455,9 @@ class MoneyValueTest {
         @Test
         public void testMultiplyZeroValue() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(0.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(5.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(0.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.multiply(moneyValue2);
@@ -473,9 +473,9 @@ class MoneyValueTest {
         @Test
         public void testDivideSameCurrency() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(2.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(2.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.divide(moneyValue2);
@@ -489,7 +489,7 @@ class MoneyValueTest {
             // Given
             MoneyValue.Currency neutralCurrency = MoneyValue.NEUTRAL_CURRENCY;
             MoneyValue moneyValue1 = new MoneyValue(100.0, neutralCurrency);
-            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.Euro);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, MoneyValue.Currency.EURO);
             MoneyValue expected = moneyValue1.divide(moneyValue2.convertTo(neutralCurrency));
 
             // When
@@ -502,9 +502,9 @@ class MoneyValueTest {
         @Test
         public void testDivideNegativeValue() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.Dollar);
-            MoneyValue expected = new MoneyValue(-2.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(-50.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(-2.0, MoneyValue.Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.divide(moneyValue2);
@@ -516,8 +516,8 @@ class MoneyValueTest {
         @Test
         public void testDivideZeroValue() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.Dollar);
-            MoneyValue moneyValue2 = new MoneyValue(0.0, MoneyValue.Currency.Dollar);
+            MoneyValue moneyValue1 = new MoneyValue(100.0, MoneyValue.Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(0.0, MoneyValue.Currency.US_DOLLAR);
 
             // When & Then
             assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));

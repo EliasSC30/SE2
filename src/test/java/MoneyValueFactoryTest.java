@@ -8,7 +8,7 @@ class MoneyValueFactoryTest {
     public void testCreateMoneyValueWithValidAmount() {
         // Given
         double amount = 100.50;
-        MoneyValue.Currency currency = MoneyValue.Currency.Dollar;
+        MoneyValue.Currency currency = MoneyValue.Currency.US_DOLLAR;
 
         // When
         MoneyValue moneyValue = MoneyValueFactory.createMoneyValue(amount, currency);
@@ -22,7 +22,7 @@ class MoneyValueFactoryTest {
     public void testCreateMoneyValueWithInvalidAmount() {
         // Given
         double amount = -10.0;
-        MoneyValue.Currency currency = MoneyValue.Currency.Euro;
+        MoneyValue.Currency currency = MoneyValue.Currency.EURO;
 
         // When and Then
         assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> {
@@ -40,7 +40,7 @@ class MoneyValueFactoryTest {
 
         // Then
         assertEquals(100.50, moneyValue.getAmount());
-        assertEquals(MoneyValue.Currency.Dollar, moneyValue.getCurrency());
+        assertEquals(MoneyValue.Currency.US_DOLLAR, moneyValue.getCurrency());
     }
 
     @Test

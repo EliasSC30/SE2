@@ -1,6 +1,6 @@
 public class MoneyValue {
-    public enum Currency{Euro, Dollar, JapaneseYen, Pound};
-    public static Currency NEUTRAL_CURRENCY = Currency.Dollar;
+    public enum Currency{EURO, US_DOLLAR, JAPANESE_YEN, BRITISH_POUND};
+    public static Currency NEUTRAL_CURRENCY = Currency.US_DOLLAR;
     private final double amount;
     private final Currency currency;
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
@@ -84,7 +84,7 @@ public class MoneyValue {
 
     public boolean isValid()
     {
-        return !Double.isNaN(this.amount) && !Double.isInfinite(this.amount);
+        return !Double.isNaN(this.amount);
     }
 
     public MoneyValue convertTo(Currency toCurrency)

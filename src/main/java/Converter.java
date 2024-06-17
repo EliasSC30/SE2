@@ -5,34 +5,34 @@ import java.util.regex.Pattern;
 
 public class Converter {
     public static final Map<Character, MoneyValue.Currency> SYMBOL_TO_CURRENCY = new HashMap<>(Map.of(
-            '$', MoneyValue.Currency.Dollar,
-            '€', MoneyValue.Currency.Euro,
-            '¥', MoneyValue.Currency.JapaneseYen,
-            '£', MoneyValue.Currency.Pound
+            '$', MoneyValue.Currency.US_DOLLAR,
+            '€', MoneyValue.Currency.EURO,
+            '¥', MoneyValue.Currency.JAPANESE_YEN,
+            '£', MoneyValue.Currency.BRITISH_POUND
     ));
     public static final Map<MoneyValue.Currency, Character> CURRENCY_TO_SYMBOL = new HashMap<>(Map.of(
-            MoneyValue.Currency.Dollar, '$',
-            MoneyValue.Currency.Euro, '€',
-            MoneyValue.Currency.JapaneseYen, '¥',
-            MoneyValue.Currency.Pound, '£'
+            MoneyValue.Currency.US_DOLLAR, '$',
+            MoneyValue.Currency.EURO, '€',
+            MoneyValue.Currency.JAPANESE_YEN, '¥',
+            MoneyValue.Currency.BRITISH_POUND, '£'
     ));
     public static final Map<String, MoneyValue.Currency> ISO_TO_CURRENCY = new HashMap<>(Map.of(
-            "USD", MoneyValue.Currency.Dollar,
-            "EUR", MoneyValue.Currency.Euro,
-            "JPY", MoneyValue.Currency.JapaneseYen,
-            "GBP", MoneyValue.Currency.Pound
+            "USD", MoneyValue.Currency.US_DOLLAR,
+            "EUR", MoneyValue.Currency.EURO,
+            "JPY", MoneyValue.Currency.JAPANESE_YEN,
+            "GBP", MoneyValue.Currency.BRITISH_POUND
     ));
     public static final Map<MoneyValue.Currency, String> CURRENCY_TO_ISO = new HashMap<>(Map.of(
-             MoneyValue.Currency.Dollar, "USD",
-             MoneyValue.Currency.Euro, "EUR",
-             MoneyValue.Currency.JapaneseYen, "JPY",
-             MoneyValue.Currency.Pound, "GBP"
+             MoneyValue.Currency.US_DOLLAR, "USD",
+             MoneyValue.Currency.EURO, "EUR",
+             MoneyValue.Currency.JAPANESE_YEN, "JPY",
+             MoneyValue.Currency.BRITISH_POUND, "GBP"
     ));
     public static final Map<MoneyValue.Currency, Double> CONVERSION_TO_NEUTRAL = new HashMap<>(Map.of(
-            MoneyValue.Currency.Dollar, 1.0,
-            MoneyValue.Currency.Euro, 1.09,
-            MoneyValue.Currency.JapaneseYen, 0.0064,
-            MoneyValue.Currency.Pound, 1.28
+            MoneyValue.Currency.US_DOLLAR, 1.0,
+            MoneyValue.Currency.EURO, 1.09,
+            MoneyValue.Currency.JAPANESE_YEN, 0.0064,
+            MoneyValue.Currency.BRITISH_POUND, 1.28
     ));
 
     public static class InvalidConversionException extends RuntimeException {
@@ -152,22 +152,5 @@ public class Converter {
             throw new MoneyValue.InvalidMoneyValueException("");
 
         return ISO_TO_CURRENCY.get(iso);
-    }
-
-    private static int nextNonWhiteSpaceIndex(String str, int index)
-    {
-        while(index < str.length() && str.charAt(index) == ' ')
-            ++index;
-        return index;
-    }
-
-    //Assumes a digit at start index
-    private static int lastDigitIndex(String str, int index)
-    {
-
-        while(index + 1 < str.length() && Character.isDigit(str.charAt(index + 1)))
-            ++index;
-
-        return index;
     }
 }

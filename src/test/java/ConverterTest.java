@@ -15,8 +15,8 @@ class ConverterTest {
 
     @BeforeEach
     void setUp() {
-        dollar = MoneyValue.Currency.Dollar;
-        euro = MoneyValue.Currency.Euro;
+        dollar = MoneyValue.Currency.US_DOLLAR;
+        euro = MoneyValue.Currency.EURO;
     }
 
     @Nested
@@ -137,20 +137,20 @@ class ConverterTest {
         public void testStringToMoneyValues() {
             Map<String, MoneyValue.Currency>[] currencySigns = new HashMap[]{
                     new HashMap<String, MoneyValue.Currency>() {{
-                        put("$", MoneyValue.Currency.Dollar);
-                        put("USD", MoneyValue.Currency.Dollar);
+                        put("$", MoneyValue.Currency.US_DOLLAR);
+                        put("USD", MoneyValue.Currency.US_DOLLAR);
                     }},
                     new HashMap<String, MoneyValue.Currency>() {{
-                        put("€", MoneyValue.Currency.Euro);
-                        put("EUR", MoneyValue.Currency.Euro);
+                        put("€", MoneyValue.Currency.EURO);
+                        put("EUR", MoneyValue.Currency.EURO);
                     }},
                     new HashMap<String, MoneyValue.Currency>() {{
-                        put("¥", MoneyValue.Currency.JapaneseYen);
-                        put("JPY", MoneyValue.Currency.JapaneseYen);
+                        put("¥", MoneyValue.Currency.JAPANESE_YEN);
+                        put("JPY", MoneyValue.Currency.JAPANESE_YEN);
                     }},
                     new HashMap<String, MoneyValue.Currency>() {{
-                        put("£", MoneyValue.Currency.Pound);
-                        put("GBP", MoneyValue.Currency.Pound);
+                        put("£", MoneyValue.Currency.BRITISH_POUND);
+                        put("GBP", MoneyValue.Currency.BRITISH_POUND);
                     }}
             };
 
