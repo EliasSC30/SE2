@@ -25,9 +25,9 @@ public class MoneyValue {
 
     MoneyValue(double amount)
     {
-        if (Double.isNaN(amount) || !amountIsInRange(amount)) {
+        if (Double.isNaN(amount) || !amountIsInRange(amount))
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
-        }
+
         this.amount = Converter.roundTwoPlaces(amount);
         this.currency = NEUTRAL_CURRENCY;
     }
