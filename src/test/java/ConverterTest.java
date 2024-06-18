@@ -20,29 +20,6 @@ class ConverterTest {
     }
 
     @Nested
-    class ConverterConvertToNeutralTest{
-        @Test
-        public void testConvertToNeutralValidMoneyValue() {
-            // Given
-            MoneyValue mv = new MoneyValue(100.0, dollar);
-
-            // When
-            MoneyValue neutralValue = Converter.convertToNeutral(mv);
-
-            // Then
-            assertEquals(100.0, neutralValue.getAmount());
-            assertEquals(MoneyValue.NEUTRAL_CURRENCY, neutralValue.getCurrency());
-        }
-
-        @Test
-        public void testConvertToNeutralNullMoneyValue() {
-            // Given & When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class,
-                    () -> Converter.convertToNeutral(null));
-        }
-    }
-
-    @Nested
     class ConverterConvertToTest{
         @Test
         public void testConvertToValidMoneyValue() {

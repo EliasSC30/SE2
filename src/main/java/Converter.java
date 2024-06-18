@@ -20,16 +20,6 @@ public class Converter {
         }
     }
 
-    public static MoneyValue convertToNeutral(MoneyValue mv)
-    {
-        if(mv == null)
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
-
-        double toNeutralFactor = CONVERSION_TO_NEUTRAL.get(mv.getCurrency());
-
-        return new MoneyValue(roundTwoPlaces(mv.getAmount() * toNeutralFactor), MoneyValue.NEUTRAL_CURRENCY);
-    }
-
     public static MoneyValue convertTo(MoneyValue mv, Currency toCurrency)
     {
         if(mv == null || !mv.isValid())
