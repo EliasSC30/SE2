@@ -58,6 +58,15 @@ class MoneyValueTest {
         }
 
         @Test
+        public void testMoneyValueConstructorNegativeAmountInvalidAmount() {
+            // Given
+            double amount = -5.0;
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
+        }
+
+        @Test
         public void testMoneyValueConstructorAmountInvalidAmount() {
             // Given
             double amount = Double.NaN;
@@ -75,73 +84,124 @@ class MoneyValueTest {
             assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
         }
 
+        @Test
+        public void testMoneyValueConstructorFrontString() {
+            // Given
+            String str = "$ 100.00";
 
-            @Test
-            public void testMoneyValueConstructorFrontString() {
-                // Given
-                String str = "$ 100.00";
+            // When
+            MoneyValue mv = new MoneyValue(str);
 
-                // When
-                MoneyValue mv = new MoneyValue(str);
+            // Then
+            assertEquals(100.0, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
 
-                // Then
-                assertEquals(100.0, mv.getAmount());
-                assertEquals(Currency.US_DOLLAR, mv.getCurrency());
-            }
+        @Test
+        public void testMoneyValueConstructorBackString() {
+            // Given
+            String str = "100.0 $";
 
-            @Test
-            public void testMoneyValueConstructorBackString() {
-                // Given
-                String str = "100.0 $";
+            // When
+            MoneyValue mv = new MoneyValue(str);
 
-                // When
-                MoneyValue mv = new MoneyValue(str);
+            // Then
+            assertEquals(100.0, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
 
-                // Then
-                assertEquals(100.0, mv.getAmount());
-                assertEquals(Currency.US_DOLLAR, mv.getCurrency());
-            }
+        @Test
+        public void testMoneyValueConstructorInvalidStringOnlyAmount() {
+            // Given
+            String str = "100.0";
 
-            @Test
-            public void testStringToMoneyValues() {
-                Map<String, Currency>[] currencySigns = new HashMap[]{
-                        new HashMap<String, Currency>() {{
-                            put("$", Currency.US_DOLLAR);
-                            put("USD", Currency.US_DOLLAR);
-                        }},
-                        new HashMap<String, Currency>() {{
-                            put("€", Currency.EURO);
-                            put("EUR", Currency.EURO);
-                        }},
-                        new HashMap<String, Currency>() {{
-                            put("¥", Currency.JAPANESE_YEN);
-                            put("JPY", Currency.JAPANESE_YEN);
-                        }},
-                        new HashMap<String, Currency>() {{
-                            put("£", Currency.BRITISH_POUND);
-                            put("GBP", Currency.BRITISH_POUND);
-                        }}
-                };
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+        }
 
-                for (Map<String, Currency> map : currencySigns) {
-                    for (Map.Entry<String, Currency> entry : map.entrySet()) {
-                        String currencyStr = entry.getKey();
-                        Currency expectedCurrency = entry.getValue();
-                        String input = "123.45 " + currencyStr;
-                        MoneyValue result = new MoneyValue(input);
-                        assertEquals(123.45, result.getAmount());
-                        assertEquals(expectedCurrency, result.getCurrency());
-                    }
+        @Test
+        public void testMoneyValueConstructorInvalidStringNegativeAmount() {
+            // Given
+            String str = "-100.0 $";
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+        }
+
+        @Test
+        public void testMoneyValueConstructorInvalidStringInvalidCurrency() {
+            // Given
+            String str = "100.0 (";
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+        }
+
+        @Test
+        public void testMoneyValueConstructorInvalidStringIntegerAmount() {
+            // Given
+            String str = "100 $";
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(100.0, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorInvalidStringOnlyCurrency() {
+            // Given
+            String str = "$";
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+        }
+
+        @Test
+        public void testMoneyValueConstructorStringDifferentCurrencies() {
+            // Given
+            Map<String, Currency>[] currencySigns = new HashMap[]{
+                    new HashMap<String, Currency>() {{
+                        put("$", Currency.US_DOLLAR);
+                        put("USD", Currency.US_DOLLAR);
+                    }},
+                    new HashMap<String, Currency>() {{
+                        put("€", Currency.EURO);
+                        put("EUR", Currency.EURO);
+                    }},
+                    new HashMap<String, Currency>() {{
+                        put("¥", Currency.JAPANESE_YEN);
+                        put("JPY", Currency.JAPANESE_YEN);
+                    }},
+                    new HashMap<String, Currency>() {{
+                        put("£", Currency.BRITISH_POUND);
+                        put("GBP", Currency.BRITISH_POUND);
+                    }}
+            };
+
+
+            for (Map<String, Currency> map : currencySigns) {
+                for (Map.Entry<String, Currency> entry : map.entrySet()) {
+                    String currencyStr = entry.getKey();
+                    Currency expectedCurrency = entry.getValue();
+                    String input = "123.45 " + currencyStr;
+                    // When
+                    MoneyValue result = new MoneyValue(input);
+                    // Then
+                    assertEquals(123.45, result.getAmount());
+                    assertEquals(expectedCurrency, result.getCurrency());
                 }
             }
-
+        }
     }
 
     @Test
     public void testGetCurrency() {
         // Given
         Currency expectedCurrency = Currency.EURO;
-        MoneyValue moneyValue = new MoneyValue(100.0, Currency.EURO);
+        MoneyValue moneyValue = new MoneyValue(100.0, expectedCurrency);
 
         // When
         Currency actualCurrency = moneyValue.getCurrency();
@@ -154,7 +214,7 @@ class MoneyValueTest {
     public void testGetAmount() {
         // Given
         double expectedAmount = 100.0;
-        MoneyValue moneyValue = new MoneyValue(100.0, Currency.US_DOLLAR);
+        MoneyValue moneyValue = new MoneyValue(expectedAmount, Currency.US_DOLLAR);
 
         // When
         double actualAmount = moneyValue.getAmount();
@@ -163,49 +223,103 @@ class MoneyValueTest {
         assertEquals(expectedAmount, actualAmount, 0.0);
     }
 
-    @Test
-    public void testToStringValid() {
-        // Given
-        double amount = 123.456;
-        Currency currency = Currency.EURO;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "123,46 €";
+    @Nested
+    class testMoneyValueToString{
+        @Test
+        public void testToEURStringValid() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.EURO;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "123,46 €";
 
-        // When
-        String actual = moneyValue.toString();
+            // When
+            String actual = moneyValue.toString();
 
-        // Then
-        assertEquals(expected, actual);
+            // Then
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        public void testToUSDollarStringValid() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.US_DOLLAR;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "$ 123,46";
+
+            // When
+            String actual = moneyValue.toString();
+
+            // Then
+            assertEquals(expected, actual);
+        }
     }
 
-    @Test
-    public void testToISOCode() {
-        // Given
-        double amount = 123.456;
-        Currency currency = Currency.EURO;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "123.46 EUR";
+    @Nested
+    class testMoneyValueToISOCode {
+        @Test
+        public void testToISOCodeEUR() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.EURO;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "123,46 EUR";
 
-        // When
-        String actual = moneyValue.toISOCode();
+            // When
+            String actual = moneyValue.toISOCode();
 
-        // Then
-        assertEquals(expected, actual);
+            // Then
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        public void testToISOCode() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.US_DOLLAR;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "123.46 USD";
+
+            // When
+            String actual = moneyValue.toISOCode();
+
+            // Then
+            assertEquals(expected, actual);
+        }
     }
 
-    @Test
-    public void testToISOCodePrefix() {
-        // Given
-        double amount = 100.0;
-        Currency currency = Currency.JAPANESE_YEN;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "JPY 100.0";
+    @Nested
+    class testMoneyValueToISOCodePrefix{
+        @Test
+        public void testToISOCodePrefixJAPYEN() {
+            // Given
+            double amount = 100.0;
+            Currency currency = Currency.JAPANESE_YEN;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "JPY 100.0";
 
-        // When
-        String actual = moneyValue.toISOCodePrefix();
+            // When
+            String actual = moneyValue.toISOCodePrefix();
 
-        // Then
-        assertEquals(expected, actual);
+            // Then
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        public void testToISOCodePrefixEUR() {
+            // Given
+            double amount = 100.0;
+            Currency currency = Currency.JAPANESE_YEN;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "EUR 100,0";
+
+            // When
+            String actual = moneyValue.toISOCodePrefix();
+
+            // Then
+            assertEquals(expected, actual);
+        }
     }
 
     @Nested
@@ -266,7 +380,6 @@ class MoneyValueTest {
 
   @Nested
   class MoneyValueCompareToTest {
-
       @Test
       public void testCompareToSameObject() {
           // Given
@@ -276,7 +389,6 @@ class MoneyValueTest {
           // When & Then
           assertEquals(0, moneyValue1.compareTo(moneyValue2));
       }
-
       @Test
       public void testCompareToEqualValues() {
           // Given
@@ -286,7 +398,6 @@ class MoneyValueTest {
           // When & Then
           assertTrue(moneyValue1.compareTo(moneyValue2) != 0);
       }
-
       @Test
       public void testCompareToEqualValuesWithDifferentCurrencies() {
           // Given
@@ -296,9 +407,6 @@ class MoneyValueTest {
           // When & Then
           assertEquals(0, moneyValue1.compareTo(moneyValue2));
       }
-
-
-
       @Test
       public void testCompareToGreaterValue() {
           // Given
@@ -308,7 +416,6 @@ class MoneyValueTest {
           // When & Then
           assertTrue(moneyValue1.compareTo(moneyValue2) > 0);
       }
-
       @Test
       public void testCompareToSmallerValue() {
           // Given
@@ -331,7 +438,6 @@ class MoneyValueTest {
 
    @Nested
     public class MoneyValueConvertToTest {
-
         @Test
         public void testConvertToSameCurrency() {
             // Given
@@ -348,9 +454,13 @@ class MoneyValueTest {
         @Test
         public void testConvertToDifferentCurrency() {
             // Given
-            MoneyValue moneyValue = new MoneyValue(1.0, Currency.US_DOLLAR);
+            double amount = 1.0;
+            double exchangeRate = 1.07;
+            double expected = Converter.roundTwoPlaces(amount/exchangeRate);
+
+            MoneyValue moneyValue = new MoneyValue(amount, Currency.US_DOLLAR);
             Currency toCurrency = Currency.EURO;
-            double expected = Converter.roundTwoPlaces(1.0/1.09);
+
             // When
             MoneyValue converted = moneyValue.convertTo(toCurrency);
 
@@ -362,7 +472,6 @@ class MoneyValueTest {
 
     @Nested
     class MoneyValueAddTest {
-
         @Test
         public void testAddSameCurrency() {
             // Given
@@ -393,6 +502,7 @@ class MoneyValueTest {
 
         @Test
         public void testAddNegativeValue() {
+            // TODO Negative Values should not be possible to add. Use Subtract instead
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.EURO);
             MoneyValue moneyValue2 = new MoneyValue(-50.0, Currency.EURO);
@@ -404,7 +514,6 @@ class MoneyValueTest {
             // Then
             assertEquals(expected, result);
         }
-
     }
 
     @Nested
@@ -440,6 +549,7 @@ class MoneyValueTest {
 
         @Test
         public void testSubtractNegativeValue() {
+            // TODO Negative Values should not be possible to subtract. Use Add instead
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(-50.0, Currency.US_DOLLAR);
@@ -455,7 +565,6 @@ class MoneyValueTest {
 
     @Nested
     public class MoneyValueMultiplyTest {
-
         @Test
         public void testMultiplySameCurrency() {
             // Given
@@ -473,9 +582,14 @@ class MoneyValueTest {
         @Test
         public void testMultiplyDifferentCurrencies() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(10.0, Currency.US_DOLLAR);
-            MoneyValue moneyValue2 = new MoneyValue(5.0, Currency.EURO);
-            MoneyValue expected = new MoneyValue(15.0, Currency.US_DOLLAR);
+            double amount1 = 10.0;
+            double amount2 = 5.0;
+            double exchangeRate = 1.07;
+            double expectedValue = (amount2 * exchangeRate) * amount1;
+
+            MoneyValue moneyValue1 = new MoneyValue(amount1, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(amount2, Currency.EURO);
+            MoneyValue expected = new MoneyValue(expectedValue, Currency.US_DOLLAR);
 
             // When
             MoneyValue result = moneyValue1.multiply(moneyValue2, Currency.US_DOLLAR);
@@ -486,6 +600,7 @@ class MoneyValueTest {
 
         @Test
         public void testMultiplyNegativeValue() {
+            // TODO What use-case use multiply negative values?
             // Given
             MoneyValue moneyValue1 = new MoneyValue(-10.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(5.0, Currency.US_DOLLAR);
@@ -515,7 +630,6 @@ class MoneyValueTest {
 
     @Nested
     public class MoneyValueDivideTest {
-
         @Test
         public void testDivideSameCurrency() {
             // Given
@@ -546,6 +660,7 @@ class MoneyValueTest {
 
         @Test
         public void testDivideNegativeValue() {
+            // TODO What use-case use multiply negative values?
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(-50.0, Currency.US_DOLLAR);
@@ -571,6 +686,7 @@ class MoneyValueTest {
 
     @Test
     void testConcatenation() {
+        // TODO @I573040 Please write comments in the test to make test understandable
         double expAddAmount = 2.0;
         double expSubAmount = 0.0;
         double expMulAmount = 0.0;

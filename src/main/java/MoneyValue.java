@@ -12,8 +12,7 @@ public class MoneyValue {
         }
     }
 
-    MoneyValue(double amount, Currency currency)
-    {
+    MoneyValue(double amount, Currency currency) {
         if (Double.isNaN(amount) || !amountIsInRange(amount)) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
@@ -29,13 +28,16 @@ public class MoneyValue {
         if(str == null || str.equals(""))
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
+        // First ISO then amount
         Pattern pattern = Pattern.compile("([\\$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
         Matcher matcher = pattern.matcher(str);
 
         String currencyStr;
         String amountStr;
 
+        // Extracts currency and amount from the input string.
         if (!matcher.find() || matcher.group(1) == null || matcher.group(2) == null) {
+            // First amount then ISO
             pattern = Pattern.compile("([\\d.,]+)\\s*([\\$€¥£]|USD|EUR|JPY|GBP)?");
             matcher = pattern.matcher(str);
 
@@ -50,7 +52,7 @@ public class MoneyValue {
             amountStr = matcher.group(2);
         }
 
-
+        // Convert String to currency
         Currency currency;
         if (currencyStr == null || currencyStr.isEmpty()) {
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
@@ -61,12 +63,11 @@ public class MoneyValue {
             currency = Currency.fromSymbol(currencyChar);
         }
 
-
+        // Convert String to amount
         double unroundedAmount;
         try {
             unroundedAmount = Double.parseDouble(amountStr);
-        } catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
         }
 
@@ -82,8 +83,7 @@ public class MoneyValue {
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         Double roundedAmount = Converter.roundTwoPlaces(amount);
         String formattedAmount = String.format("%.2f", roundedAmount);
 
@@ -117,8 +117,7 @@ public class MoneyValue {
         return currency.getIsoCode() + " " + Converter.roundTwoPlaces(amount);
     }
 
-    public int compareTo(MoneyValue other)
-    {
+    public int compareTo(MoneyValue other) {
         if(this == other)
             return 0;
 
@@ -127,8 +126,8 @@ public class MoneyValue {
         return (int)((100.0 * ((this).amount - converted.getAmount())) );
     }
 
-    public boolean isValid()
-    {
+    // Redundant?
+    public boolean isValid() {
         return !Double.isNaN(this.amount);
     }
 
@@ -137,8 +136,7 @@ public class MoneyValue {
         return Converter.convertTo(this, toCurrency);
     }
 
-    public MoneyValue add(MoneyValue other, Currency toCurrency)
-    {
+    public MoneyValue add(MoneyValue other, Currency toCurrency) {
         if(atLeastOneIsInvalid(this, other))
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
@@ -148,8 +146,7 @@ public class MoneyValue {
         return new MoneyValue(thisNeutral.amount + otherNeutral.amount, toCurrency);
     }
 
-    public MoneyValue subtract(MoneyValue other, Currency toCurrency)
-    {
+    public MoneyValue subtract(MoneyValue other, Currency toCurrency) {
         if(atLeastOneIsInvalid(this, other))
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
@@ -159,8 +156,7 @@ public class MoneyValue {
         return new MoneyValue(thisNeutral.getAmount() - otherNeutral.getAmount(), toCurrency);
     }
 
-    public MoneyValue multiply(MoneyValue other, Currency toCurrency)
-    {
+    public MoneyValue multiply(MoneyValue other, Currency toCurrency) {
         if(atLeastOneIsInvalid(this, other))
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
@@ -170,8 +166,7 @@ public class MoneyValue {
         return new MoneyValue(thisNeutral.getAmount() * otherNeutral.getAmount(), toCurrency);
     }
 
-    public MoneyValue divide(MoneyValue other, Currency toCurrency)
-    {
+    public MoneyValue divide(MoneyValue other, Currency toCurrency) {
         if(atLeastOneIsInvalid(this, other) || other.getAmount() == 0.0)
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
 
@@ -181,8 +176,7 @@ public class MoneyValue {
         return new MoneyValue(Converter.roundTwoPlaces(thisNeutral.getAmount() / otherNeutral.getAmount()), toCurrency);
     }
 
-    private static boolean atLeastOneIsInvalid(MoneyValue a, MoneyValue b)
-    {
+    private static boolean atLeastOneIsInvalid(MoneyValue a, MoneyValue b) {
         return a == null || b == null || !a.isValid() || !b.isValid();
     }
 
