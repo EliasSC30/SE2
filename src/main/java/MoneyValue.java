@@ -8,6 +8,12 @@ public class MoneyValue {
     private final Currency currency;
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
 
+    public static class InvalidMoneyValueException extends RuntimeException {
+        public InvalidMoneyValueException(String message) {
+            super(message);
+        }
+    }
+
     public MoneyValue(double v, Currency currency) {
         this(new BigDecimal(v), currency);
     }
@@ -15,11 +21,7 @@ public class MoneyValue {
         this(new BigDecimal(v), currency);
     }
 
-    public static class InvalidMoneyValueException extends RuntimeException {
-        public InvalidMoneyValueException(String message) {
-            super(message);
-        }
-    }
+
 
     private static final Pattern PATTERN_WITH_CURRENCY_FIRST = Pattern.compile("([$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
     private static final Pattern PATTERN_WITH_AMOUNT_FIRST = Pattern.compile("([\\d.,]+)\\s*([$€¥£]|USD|EUR|JPY|GBP)?");
@@ -112,35 +114,31 @@ public class MoneyValue {
         return Converter.convertTo(this, toCurrency);
     }
 
-    public MoneyValue add(MoneyValue other, Currency toCurrency) {
+    public MoneyValue add(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue thisNeutral = Converter.convertTo(this, toCurrency);
-        MoneyValue otherNeutral = Converter.convertTo(other, toCurrency);
-        return new MoneyValue(thisNeutral.amount.add(otherNeutral.amount), toCurrency);
+        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        return new MoneyValue(this.amount.add(otherRightCurrency.amount), this.currency);
     }
 
-    public MoneyValue subtract(MoneyValue other, Currency toCurrency) {
+    public MoneyValue subtract(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue thisNeutral = Converter.convertTo(this, toCurrency);
-        MoneyValue otherNeutral = Converter.convertTo(other, toCurrency);
-        return new MoneyValue(thisNeutral.amount.subtract(otherNeutral.amount), toCurrency);
+        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        return new MoneyValue(this.amount.subtract(otherRightCurrency.amount), this.currency);
     }
 
-    public MoneyValue multiply(MoneyValue other, Currency toCurrency) {
+    public MoneyValue multiply(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue thisNeutral = Converter.convertTo(this, toCurrency);
-        MoneyValue otherNeutral = Converter.convertTo(other, toCurrency);
-        return new MoneyValue(thisNeutral.amount.multiply(otherNeutral.amount), toCurrency);
+        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        return new MoneyValue(this.amount.multiply(otherRightCurrency.amount), this.currency);
     }
 
-    public MoneyValue divide(MoneyValue other, Currency toCurrency) {
+    public MoneyValue divide(MoneyValue other) {
         if (other.amount.compareTo(BigDecimal.ZERO) == 0) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
         validateForOperation(this, other);
-        MoneyValue thisNeutral = Converter.convertTo(this, toCurrency);
-        MoneyValue otherNeutral = Converter.convertTo(other, toCurrency);
-        return new MoneyValue(thisNeutral.amount.divide(otherNeutral.amount, 2, RoundingMode.HALF_UP), toCurrency);
+        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        return new MoneyValue(this.amount.divide(otherRightCurrency.amount, 2, RoundingMode.HALF_UP), this.currency);
     }
 
     private static void validateForOperation(MoneyValue a, MoneyValue b) {

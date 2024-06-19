@@ -9,10 +9,10 @@ public class Main {
         System.out.println(Converter.convertTo(c1, Currency.EURO));
         System.out.println(Converter.convertTo(c2, Currency.US_DOLLAR));
 
-        System.out.println(m1.add(m2, Currency.US_DOLLAR).convertTo(Currency.JAPANESE_YEN).multiply(m1, Currency.US_DOLLAR).toISOCode());
-        System.out.println(m1.subtract(m2, Currency.US_DOLLAR).toISOCode());
-        System.out.println(m1.divide(m2, Currency.US_DOLLAR).toISOCode());
-        System.out.println(m1.multiply(m2, Currency.US_DOLLAR).toISOCode());
+        System.out.println(m1.add(m2).convertTo(Currency.JAPANESE_YEN).multiply(m1).toISOCode());
+        System.out.println(m1.subtract(m2).toISOCode());
+        System.out.println(m1.divide(m2).toISOCode());
+        System.out.println(m1.multiply(m2).toISOCode());
 
     }
 }
