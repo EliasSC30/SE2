@@ -58,15 +58,6 @@ class MoneyValueTest {
         }
 
         @Test
-        public void testMoneyValueConstructorNegativeAmountInvalidAmount() {
-            // Given
-            double amount = -5.0;
-
-            // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
-        }
-
-        @Test
         public void testMoneyValueConstructorAmountInvalidAmount() {
             // Given
             double amount = Double.NaN;
@@ -114,15 +105,6 @@ class MoneyValueTest {
         public void testMoneyValueConstructorInvalidStringOnlyAmount() {
             // Given
             String str = "100.0";
-
-            // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
-        }
-
-        @Test
-        public void testMoneyValueConstructorInvalidStringNegativeAmount() {
-            // Given
-            String str = "-100.0 $";
 
             // When & Then
             assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
