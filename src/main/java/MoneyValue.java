@@ -7,25 +7,33 @@ public class MoneyValue {
     private final BigDecimal amount;
     private final Currency currency;
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
-
+  
+    private static final Pattern PATTERN_WITH_CURRENCY_FIRST = Pattern.compile("([$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
+    private static final Pattern PATTERN_WITH_AMOUNT_FIRST = Pattern.compile("([\\d.,]+)\\s*([$€¥£]|USD|EUR|JPY|GBP)?");
+  
     public static class InvalidMoneyValueException extends RuntimeException {
         public InvalidMoneyValueException(String message) {
             super(message);
         }
     }
-
+  
+    
     public MoneyValue(double v, Currency currency) {
         this(new BigDecimal(v), currency);
     }
+  
     public MoneyValue(int v, Currency currency) {
         this(new BigDecimal(v), currency);
     }
 
-
-
-    private static final Pattern PATTERN_WITH_CURRENCY_FIRST = Pattern.compile("([$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
-    private static final Pattern PATTERN_WITH_AMOUNT_FIRST = Pattern.compile("([\\d.,]+)\\s*([$€¥£]|USD|EUR|JPY|GBP)?");
-
+    public MoneyValue(double v, Currency currency) {
+        this(new BigDecimal(v), currency);
+    }
+  
+    public MoneyValue(int v, Currency currency) {
+        this(new BigDecimal(v), currency);
+    }
+  
     public MoneyValue(BigDecimal amount, Currency currency) {
         if (amount == null || currency == null) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
@@ -33,17 +41,20 @@ public class MoneyValue {
         this.amount = amount.setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
     }
-
+  
     public MoneyValue(String str) {
         if (str == null || str.isEmpty()) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
 
+        // First ISO then amount
         Matcher matcher = PATTERN_WITH_CURRENCY_FIRST.matcher(str);
         String currencyStr;
         String amountStr;
 
+        // Extracts currency and amount from the input string.
         if (!matcher.find() || matcher.group(1) == null || matcher.group(2) == null) {
+            // First amount then ISO
             matcher = PATTERN_WITH_AMOUNT_FIRST.matcher(str);
             if (!matcher.find()) {
                 throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
@@ -55,12 +66,13 @@ public class MoneyValue {
             amountStr = matcher.group(2);
         }
 
+        // Convert String to currency
         if (currencyStr == null || currencyStr.isEmpty()) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
-
         Currency currency = currencyStr.length() == 3 ? Currency.fromIsoCode(currencyStr) : Currency.fromSymbol(currencyStr.charAt(0));
 
+        // Convert String to amount
         BigDecimal unroundedAmount;
         try {
             unroundedAmount = new BigDecimal(amountStr.replace(",", ""));
