@@ -1,11 +1,8 @@
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Converter {
     private static final ExchangeRateProvider exchangeRateProvider = new FixedExchangeRateProvider();
-
 
     public static final Map<Currency, Double> CONVERSION_TO_NEUTRAL = new HashMap<>(Map.of(
             Currency.US_DOLLAR, 1.0,
@@ -32,8 +29,6 @@ public class Converter {
 
         return new MoneyValue(roundTwoPlaces(mv.getAmount() * toFactor), toCurrency);
     }
-
-
 
     public static double roundTwoPlaces(double amount)
     {
