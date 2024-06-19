@@ -1,12 +1,9 @@
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Converter {
     private static final ExchangeRateProvider exchangeRateProvider = new FixedExchangeRateProvider();
-
 
     public static final Map<Currency, Double> CONVERSION_TO_NEUTRAL = new HashMap<>(Map.of(
             Currency.US_DOLLAR, 1.0,
@@ -30,7 +27,6 @@ public class Converter {
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
         BigDecimal toFactor = BigDecimal.valueOf(exchangeRateProvider.getExchangeRate(mv.getCurrency(), toCurrency));
-
 
         return new MoneyValue(mv.getAmount().multiply(toFactor), toCurrency);
     }
