@@ -29,6 +29,7 @@ public class FixedExchangeRateProvider implements ExchangeRateProvider {
 
     @Override
     public Double getExchangeRate(Currency from, Currency to) {
+        if(from.equals(to)) return 1.0;
         Double rate = rates.get(createKey(from, to));
         if (rate == null) {
             throw new IllegalArgumentException("Exchange rate not found for: " + from + " to " + to);
