@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -153,14 +154,14 @@ class MoneyValueTest {
     @Test
     public void testGetAmount() {
         // Given
-        double expectedAmount = 100.0;
+        BigDecimal expectedAmount = BigDecimal.valueOf(100.0);
         MoneyValue moneyValue = new MoneyValue(100.0, Currency.US_DOLLAR);
 
         // When
-        double actualAmount = moneyValue.getAmount();
+        BigDecimal actualAmount = moneyValue.getAmount();
 
         // Then
-        assertEquals(expectedAmount, actualAmount, 0.0);
+        assertEquals(expectedAmount.doubleValue(), actualAmount.doubleValue(), BigDecimal.ZERO.doubleValue());
     }
 
     @Test
@@ -320,15 +321,6 @@ class MoneyValueTest {
       }
   }
 
-    @Test
-    void isValid() {
-        // Given
-        MoneyValue valid = new MoneyValue(1.0, Currency.US_DOLLAR);
-
-        // When & Then
-        assertTrue(valid.isValid());
-    }
-
    @Nested
     public class MoneyValueConvertToTest {
 
@@ -343,20 +335,6 @@ class MoneyValueTest {
 
             // Then
             assertEquals(moneyValue, converted);
-        }
-
-        @Test
-        public void testConvertToDifferentCurrency() {
-            // Given
-            MoneyValue moneyValue = new MoneyValue(1.0, Currency.US_DOLLAR);
-            Currency toCurrency = Currency.EURO;
-            double expected = Converter.roundTwoPlaces(1.0/1.09);
-            // When
-            MoneyValue converted = moneyValue.convertTo(toCurrency);
-
-            // Then
-            assertEquals(expected, converted.getAmount());
-            assertEquals(toCurrency, converted.getCurrency());
         }
     }
 

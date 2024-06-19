@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -22,24 +23,15 @@ public class Converter {
 
     public static MoneyValue convertTo(MoneyValue mv, Currency toCurrency)
     {
-        if(mv == null || !mv.isValid())
+        if(mv == null)
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
         if(toCurrency == null)
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
-        double toFactor = exchangeRateProvider.getExchangeRate(mv.getCurrency(), toCurrency);
-
-        return new MoneyValue(roundTwoPlaces(mv.getAmount() * toFactor), toCurrency);
-    }
+        BigDecimal toFactor = BigDecimal.valueOf(exchangeRateProvider.getExchangeRate(mv.getCurrency(), toCurrency));
 
 
-
-    public static double roundTwoPlaces(double amount)
-    {
-        if(Double.isNaN(amount))
-            return Double.NaN;
-
-        return Math.round(amount * 100) / 100.0;
+        return new MoneyValue(mv.getAmount().multiply(toFactor), toCurrency);
     }
 }

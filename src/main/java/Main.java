@@ -1,7 +1,7 @@
 public class Main {
     public static void main(String[] args) {
-        MoneyValue m1 = MoneyValueFactory.createMoneyValue("1.0 $");
-        MoneyValue m2 = MoneyValueFactory.createMoneyValue("1.6 $");
+        MoneyValue m1 = MoneyValueFactory.createMoneyValue("1.0 £");
+        MoneyValue m2 = MoneyValueFactory.createMoneyValue("1.6 ¥");
 
         MoneyValue c1 = new  MoneyValue(1, Currency.US_DOLLAR);
         MoneyValue c2 = new MoneyValue(1, Currency.EURO);
