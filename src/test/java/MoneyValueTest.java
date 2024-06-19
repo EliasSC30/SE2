@@ -371,6 +371,17 @@ class MoneyValueTest {
         }
 
         @Test
+        public void testEqualsForSameAmountsDifferentCurrencies() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = Converter.convertTo(moneyValue1, Currency.EURO);
+
+            // When & Then
+            assertTrue(moneyValue1.equals(moneyValue2));
+            assertTrue(moneyValue2.equals(moneyValue1));
+        }
+
+        @Test
         public void testNotEqualsForDifferentCurrencies() {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.00, Currency.US_DOLLAR);
@@ -405,6 +416,18 @@ class MoneyValueTest {
       }
 
       @Test
+      public void testCompareToEqualValuesWithDifferentCurrencies() {
+          // Given
+          MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+          MoneyValue moneyValue2 = Converter.convertTo(moneyValue1, Currency.EURO);
+
+          // When & Then
+          assertEquals(0, moneyValue1.compareTo(moneyValue2));
+      }
+
+
+
+      @Test
       public void testCompareToGreaterValue() {
           // Given
           MoneyValue moneyValue1 = new MoneyValue(200.0, Currency.US_DOLLAR);
@@ -434,7 +457,7 @@ class MoneyValueTest {
             Currency toCurrency = Currency.US_DOLLAR;
 
             // When
-            MoneyValue converted = moneyValue.convertTo(toCurrency);
+            MoneyValue converted = Converter.convertTo(moneyValue, toCurrency);
 
             // Then
             assertEquals(moneyValue, converted);

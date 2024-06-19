@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MoneyValue {
-    private final BigDecimal amount;
+    private BigDecimal amount;
     private final Currency currency;
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
   
@@ -26,14 +26,8 @@ public class MoneyValue {
         this(new BigDecimal(v), currency);
     }
 
-    public MoneyValue(double v, Currency currency) {
-        this(new BigDecimal(v), currency);
-    }
-  
-    public MoneyValue(int v, Currency currency) {
-        this(new BigDecimal(v), currency);
-    }
-  
+
+
     public MoneyValue(BigDecimal amount, Currency currency) {
         if (amount == null || currency == null) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
@@ -122,35 +116,42 @@ public class MoneyValue {
         return this.amount.compareTo(converted.amount);
     }
 
-    public MoneyValue convertTo(Currency toCurrency) {
-        return Converter.convertTo(this, toCurrency);
+    private void setAmount(BigDecimal amount){
+        if (amount == null) {
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        }
+        this.amount = amount.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public MoneyValue add(MoneyValue other) {
+    synchronized public MoneyValue add(MoneyValue other) {
         validateForOperation(this, other);
         MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
-        return new MoneyValue(this.amount.add(otherRightCurrency.amount), this.currency);
+        setAmount(this.amount.add(otherRightCurrency.amount));
+        return this;
     }
 
-    public MoneyValue subtract(MoneyValue other) {
+    synchronized public MoneyValue subtract(MoneyValue other) {
         validateForOperation(this, other);
         MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
-        return new MoneyValue(this.amount.subtract(otherRightCurrency.amount), this.currency);
+        setAmount(this.amount.subtract(otherRightCurrency.amount));
+        return this;
     }
 
-    public MoneyValue multiply(MoneyValue other) {
+    synchronized public MoneyValue multiply(MoneyValue other) {
         validateForOperation(this, other);
         MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
-        return new MoneyValue(this.amount.multiply(otherRightCurrency.amount), this.currency);
+        setAmount(this.amount.multiply(otherRightCurrency.amount));
+        return this;
     }
 
-    public MoneyValue divide(MoneyValue other) {
+    synchronized public MoneyValue divide(MoneyValue other) {
         if (other.amount.compareTo(BigDecimal.ZERO) == 0) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
         validateForOperation(this, other);
         MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
-        return new MoneyValue(this.amount.divide(otherRightCurrency.amount, 2, RoundingMode.HALF_UP), this.currency);
+        setAmount(this.amount.divide(otherRightCurrency.amount, 2, RoundingMode.HALF_UP));
+        return this;
     }
 
     private static void validateForOperation(MoneyValue a, MoneyValue b) {
