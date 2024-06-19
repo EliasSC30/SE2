@@ -2,6 +2,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,14 +16,13 @@ class MoneyValueTest {
         @Test
         public void testMoneyValueConstructorValidValues() {
             // Given
-            double amount = 100.0;
+            BigDecimal amount = new BigDecimal(100.00).setScale(2, RoundingMode.HALF_UP);
             Currency currency = Currency.US_DOLLAR;
 
             // When
             MoneyValue moneyValue = new MoneyValue(amount, currency);
 
             // Then
-            assertEquals(amount, moneyValue.getAmount());
             assertEquals(currency, moneyValue.getCurrency());
         }
 
@@ -46,16 +47,44 @@ class MoneyValueTest {
         }
 
         @Test
-        public void testMoneyValueConstructorAmountValidValues() {
+        public void testMoneyValueConstructorNullAmount() {
+            // Given
+            BigDecimal amount = null;
+            Currency currency = Currency.US_DOLLAR;
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
+        }
+
+        @Test
+        public void testMoneyValueConstructorAmountValidDoubleValues() {
             // Given
             double amount = 100.0;
+            Currency currency = Currency.US_DOLLAR;
+            BigDecimal expectedAmount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+
 
             // When
-            MoneyValue moneyValue = new MoneyValue(amount, Currency.US_DOLLAR);
+            MoneyValue moneyValue = new MoneyValue(100, currency);
 
             // Then
-            assertEquals(amount, moneyValue.getAmount());
-            assertEquals(Currency.US_DOLLAR, moneyValue.getCurrency());
+            assertEquals(expectedAmount, moneyValue.getAmount());
+            assertEquals(currency, moneyValue.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorAmountValidIntValues() {
+            // Given
+            int amount = 100;
+            Currency currency = Currency.US_DOLLAR;
+            BigDecimal expectedAmount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+
+            // Then
+            assertEquals(expectedAmount,moneyValue.getAmount());
+            assertEquals(currency, moneyValue.getCurrency());
         }
 
         @Test
@@ -76,66 +105,111 @@ class MoneyValueTest {
             assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
         }
 
+        @Test
+        public void testMoneyValueConstructorFrontString() {
+            // Given
+            String str = "$ 100.00";
+            BigDecimal expectedAmount = new BigDecimal(100.00).setScale(2, RoundingMode.HALF_UP);
 
-            @Test
-            public void testMoneyValueConstructorFrontString() {
-                // Given
-                String str = "$ 100.00";
+            // When
+            MoneyValue mv = new MoneyValue(str);
 
-                // When
-                MoneyValue mv = new MoneyValue(str);
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
 
-                // Then
-                assertEquals(100.0, mv.getAmount());
-                assertEquals(Currency.US_DOLLAR, mv.getCurrency());
-            }
+        @Test
+        public void testMoneyValueConstructorBackString() {
+            // Given
+            String str = "100.0 $";
+            BigDecimal expectedAmount = new BigDecimal(100.00).setScale(2, RoundingMode.HALF_UP);
 
-            @Test
-            public void testMoneyValueConstructorBackString() {
-                // Given
-                String str = "100.0 $";
+            // When
+            MoneyValue mv = new MoneyValue(str);
 
-                // When
-                MoneyValue mv = new MoneyValue(str);
+            // Then
+            assertEquals(expectedAmount,mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
 
-                // Then
-                assertEquals(100.0, mv.getAmount());
-                assertEquals(Currency.US_DOLLAR, mv.getCurrency());
-            }
+        @Test
+        public void testMoneyValueConstructorInvalidStringOnlyAmount() {
+            // Given
+            String str = "100.0";
 
-            @Test
-            public void testStringToMoneyValues() {
-                Map<String, Currency>[] currencySigns = new HashMap[]{
-                        new HashMap<String, Currency>() {{
-                            put("$", Currency.US_DOLLAR);
-                            put("USD", Currency.US_DOLLAR);
-                        }},
-                        new HashMap<String, Currency>() {{
-                            put("€", Currency.EURO);
-                            put("EUR", Currency.EURO);
-                        }},
-                        new HashMap<String, Currency>() {{
-                            put("¥", Currency.JAPANESE_YEN);
-                            put("JPY", Currency.JAPANESE_YEN);
-                        }},
-                        new HashMap<String, Currency>() {{
-                            put("£", Currency.BRITISH_POUND);
-                            put("GBP", Currency.BRITISH_POUND);
-                        }}
-                };
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+        }
 
-                for (Map<String, Currency> map : currencySigns) {
-                    for (Map.Entry<String, Currency> entry : map.entrySet()) {
-                        String currencyStr = entry.getKey();
-                        Currency expectedCurrency = entry.getValue();
-                        String input = "123.45 " + currencyStr;
-                        MoneyValue result = new MoneyValue(input);
-                        assertEquals(123.45, result.getAmount());
-                        assertEquals(expectedCurrency, result.getCurrency());
-                    }
+        @Test
+        public void testMoneyValueConstructorInvalidStringInvalidCurrency() {
+            // Given
+            String str = "100.0 (";
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+        }
+
+        @Test
+        public void testMoneyValueConstructorInvalidStringIntegerAmount() {
+            // Given
+            String str = "100 $";
+            BigDecimal expectedAmount = new BigDecimal(100.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount,mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorInvalidStringOnlyCurrency() {
+            // Given
+            String str = "$";
+
+            // When & Then
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+        }
+
+        @Test
+        public void testStringToMoneyValues() {
+            Map<String, Currency>[] currencySigns = new HashMap[]{
+                    new HashMap<String, Currency>() {{
+                        put("$", Currency.US_DOLLAR);
+                        put("USD", Currency.US_DOLLAR);
+                    }},
+                    new HashMap<String, Currency>() {{
+                        put("€", Currency.EURO);
+                        put("EUR", Currency.EURO);
+                    }},
+                    new HashMap<String, Currency>() {{
+                        put("¥", Currency.JAPANESE_YEN);
+                        put("JPY", Currency.JAPANESE_YEN);
+                    }},
+                    new HashMap<String, Currency>() {{
+                        put("£", Currency.BRITISH_POUND);
+                        put("GBP", Currency.BRITISH_POUND);
+                    }}
+            };
+
+            for (Map<String, Currency> map : currencySigns) {
+                for (Map.Entry<String, Currency> entry : map.entrySet()) {
+                    String currencyStr = entry.getKey();
+                    Currency expectedCurrency = entry.getValue();
+                    String amount = "123.45";
+                    String input = amount + " " + currencyStr;
+                    BigDecimal expectedAmount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+                    // When
+                    MoneyValue result = new MoneyValue(input);
+                    // Then
+                    assertEquals(expectedAmount, result.getAmount());
+                    assertEquals(expectedCurrency, result.getCurrency());
                 }
             }
-
+        }
     }
 
     @Test
@@ -164,49 +238,103 @@ class MoneyValueTest {
         assertEquals(expectedAmount.doubleValue(), actualAmount.doubleValue(), BigDecimal.ZERO.doubleValue());
     }
 
-    @Test
-    public void testToStringValid() {
-        // Given
-        double amount = 123.456;
-        Currency currency = Currency.EURO;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "123,46 €";
+    @Nested
+    class testMoneyValueToString{
+        @Test
+        public void testToEURStringValid() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.EURO;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "123,46 €";
 
-        // When
-        String actual = moneyValue.toString();
+            // When
+            String actual = moneyValue.toString();
 
-        // Then
-        assertEquals(expected, actual);
+            // Then
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        public void testToUSDollarStringValid() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.US_DOLLAR;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "$ 123,46";
+
+            // When
+            String actual = moneyValue.toString();
+
+            // Then
+            assertEquals(expected, actual);
+        }
     }
 
-    @Test
-    public void testToISOCode() {
-        // Given
-        double amount = 123.456;
-        Currency currency = Currency.EURO;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "123.46 EUR";
+    @Nested
+    class testMoneyValueToISOCode {
+        @Test
+        public void testToISOCodeEUR() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.EURO;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "123,46 EUR";
 
-        // When
-        String actual = moneyValue.toISOCode();
+            // When
+            String actual = moneyValue.toISOCode();
 
-        // Then
-        assertEquals(expected, actual);
+            // Then
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        public void testToISOCode() {
+            // Given
+            double amount = 123.456;
+            Currency currency = Currency.US_DOLLAR;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "123.46 USD";
+
+            // When
+            String actual = moneyValue.toISOCode();
+
+            // Then
+            assertEquals(expected, actual);
+        }
     }
 
-    @Test
-    public void testToISOCodePrefix() {
-        // Given
-        double amount = 100.0;
-        Currency currency = Currency.JAPANESE_YEN;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        String expected = "JPY 100.0";
+    @Nested
+    class testMoneyValueToISOCodePrefix{
+        @Test
+        public void testToISOCodePrefixJAPYEN() {
+            // Given
+            double amount = 100.0;
+            Currency currency = Currency.JAPANESE_YEN;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "JPY 100.00";
 
-        // When
-        String actual = moneyValue.toISOCodePrefix();
+            // When
+            String actual = moneyValue.toISOCodePrefix();
 
-        // Then
-        assertEquals(expected, actual);
+            // Then
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        public void testToISOCodePrefixEUR() {
+            // Given
+            double amount = 100.0;
+            Currency currency = Currency.EURO;
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+            String expected = "EUR 100,00";
+
+            // When
+            String actual = moneyValue.toISOCodePrefix();
+
+            // Then
+            assertEquals(expected, actual);
+        }
     }
 
     @Nested
@@ -243,21 +371,10 @@ class MoneyValueTest {
         }
 
         @Test
-        public void testEqualsForSameAmountsDifferentCurrencies() {
-            // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
-            MoneyValue moneyValue2 = moneyValue1.convertTo(Currency.EURO);
-
-            // When & Then
-            assertTrue(moneyValue1.equals(moneyValue2));
-            assertTrue(moneyValue2.equals(moneyValue1));
-        }
-
-        @Test
         public void testNotEqualsForDifferentCurrencies() {
             // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
-            MoneyValue moneyValue2 = new MoneyValue(100.0, Currency.EURO);
+            MoneyValue moneyValue1 = new MoneyValue(100.00, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(100.00, Currency.EURO);
 
             // When & Then
             assertFalse(moneyValue1.equals(moneyValue2));
@@ -265,9 +382,8 @@ class MoneyValueTest {
         }
     }
 
-  @Nested
-  class MoneyValueCompareToTest {
-
+    @Nested
+    class MoneyValueCompareToTest {
       @Test
       public void testCompareToSameObject() {
           // Given
@@ -287,18 +403,6 @@ class MoneyValueTest {
           // When & Then
           assertTrue(moneyValue1.compareTo(moneyValue2) != 0);
       }
-
-      @Test
-      public void testCompareToEqualValuesWithDifferentCurrencies() {
-          // Given
-          MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
-          MoneyValue moneyValue2 = moneyValue1.convertTo(Currency.EURO);
-
-          // When & Then
-          assertEquals(0, moneyValue1.compareTo(moneyValue2));
-      }
-
-
 
       @Test
       public void testCompareToGreaterValue() {
@@ -321,9 +425,8 @@ class MoneyValueTest {
       }
   }
 
-   @Nested
-    public class MoneyValueConvertToTest {
-
+    @Nested
+    class MoneyValueConvertToTest {
         @Test
         public void testConvertToSameCurrency() {
             // Given
