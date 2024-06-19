@@ -1,3 +1,6 @@
+pom.xml
+.idea/
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -7,7 +10,7 @@ target/
 *.iws
 *.iml
 *.ipr
-.idea/
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -33,4 +36,4 @@ build/
 ### Mac OS ###
 .DS_Store
 
-pom.xml
+
