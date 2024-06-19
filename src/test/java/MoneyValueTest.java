@@ -452,7 +452,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(150.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.add(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.add(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -466,7 +466,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(150.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.add(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.add(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -480,7 +480,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(50, Currency.EURO);
 
             // When
-            MoneyValue result = moneyValue1.add(moneyValue2, Currency.EURO);
+            MoneyValue result = moneyValue1.add(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -499,7 +499,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(50.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.subtract(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.subtract(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -513,7 +513,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(50.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.subtract(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.subtract(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -527,7 +527,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(150.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.subtract(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.subtract(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -545,7 +545,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(50.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.multiply(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -559,7 +559,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(15.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.multiply(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -573,7 +573,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(-50.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.multiply(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -587,7 +587,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(0.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.multiply(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.multiply(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -605,7 +605,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(2.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.divide(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.divide(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -619,7 +619,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(2.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.divide(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.divide(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -633,7 +633,7 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(-2.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.divide(moneyValue2, Currency.US_DOLLAR);
+            MoneyValue result = moneyValue1.divide(moneyValue2);
 
             // Then
             assertEquals(expected, result);
@@ -646,7 +646,7 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = new MoneyValue(0.0, Currency.US_DOLLAR);
 
             // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2, Currency.US_DOLLAR));
+            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));
         }
     }
 
@@ -666,10 +666,10 @@ class MoneyValueTest {
 
         for(int i = 0; i < 10; ++i)
         {
-            mvAddResult = mvAddResult.add(mvConst, Currency.US_DOLLAR);
-            mvSubResult = mvSubResult.subtract(mvConst, Currency.US_DOLLAR);
-            mvMulResult = mvMulResult.multiply(mvConst, Currency.US_DOLLAR);
-            mvDivResult = mvDivResult.divide(mvConst, Currency.US_DOLLAR);
+            mvAddResult = mvAddResult.add(mvConst);
+            mvSubResult = mvSubResult.subtract(mvConst);
+            mvMulResult = mvMulResult.multiply(mvConst);
+            mvDivResult = mvDivResult.divide(mvConst);
         }
 
         assertEquals(expAddAmount, mvAddResult.getAmount());
@@ -682,11 +682,11 @@ class MoneyValueTest {
 
         int nrOfAdditionsAndSubtractions = 1_000_000;
         for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
-            stressAddSubMv = stressAddSubMv.add(new MoneyValue(0.1, Currency.US_DOLLAR), Currency.US_DOLLAR);
+            stressAddSubMv = stressAddSubMv.add(new MoneyValue(0.1, Currency.US_DOLLAR));
         assertEquals(stressAddSubMv.getAmount(), 100_000);
 
         for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
-            stressAddSubMv = stressAddSubMv.subtract(new MoneyValue(0.1, Currency.US_DOLLAR), Currency.US_DOLLAR);
+            stressAddSubMv = stressAddSubMv.subtract(new MoneyValue(0.1, Currency.US_DOLLAR));
 
         assertEquals(stressAddSubMv.getAmount(), 0.0);
 
@@ -695,11 +695,11 @@ class MoneyValueTest {
 
         int nrOfMultAndDivs = 30;
         for(int i = 0; i < nrOfMultAndDivs; ++i)
-            stressMulDivMv = stressMulDivMv.multiply(new MoneyValue(2.0, Currency.US_DOLLAR), Currency.US_DOLLAR);
+            stressMulDivMv = stressMulDivMv.multiply(new MoneyValue(2.0, Currency.US_DOLLAR));
         assertEquals(stressMulDivMv.getAmount(), (1 << nrOfMultAndDivs));
 
         for(int i = 0; i < nrOfMultAndDivs; ++i)
-            stressMulDivMv = stressMulDivMv.divide(new MoneyValue(2.0, Currency.US_DOLLAR), Currency.US_DOLLAR);
+            stressMulDivMv = stressMulDivMv.divide(new MoneyValue(2.0, Currency.US_DOLLAR));
 
 
         assertEquals(stressMulDivMv.getAmount(), 1.0);
