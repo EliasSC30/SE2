@@ -12,6 +12,10 @@ public class Calculator {
     public MoneyValue getMoneyValue() {
        return this.mv_;
     }
+    public Converter getConverter() { return this.cv_; }
+
+    public void setMoneyValue(MoneyValue mv) { this.mv_ = mv; }
+    public void setConverter(Converter cv) { this.cv_ = cv; }
 
     public Calculator add(MoneyValue other) {
         if(!validateMoneyValue(other))
