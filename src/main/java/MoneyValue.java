@@ -1,5 +1,6 @@
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,11 +32,11 @@ public class MoneyValue {
     }
   
     
-    public MoneyValue(double v, Currency currency, Converter converter) {
+    public MoneyValue(double v, Currency currency, Converter converter)  {
         this(new BigDecimal(v), currency, converter);
     }
   
-    public MoneyValue(int v, Currency currency, Converter converter) {
+    public MoneyValue(long v, Currency currency, Converter converter)  {
         this(new BigDecimal(v), currency, converter);
     }
 
@@ -119,6 +120,10 @@ public class MoneyValue {
         if (this == obj) return true;
         if (!(obj instanceof MoneyValue other)) return false;
         return this.amount.equals(other.amount) && this.currency.equals(other.currency);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, currency, converter);
     }
 
     public String toISOCode() {
