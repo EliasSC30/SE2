@@ -6,11 +6,24 @@ import java.util.regex.Pattern;
 public class MoneyValue {
     private BigDecimal amount;
     private final Currency currency;
+    private Converter converter;
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
+    public static final String INVALID_CONVERTER = "Invalid Converter";
   
     private static final Pattern PATTERN_WITH_CURRENCY_FIRST = Pattern.compile("([$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
     private static final Pattern PATTERN_WITH_AMOUNT_FIRST = Pattern.compile("([\\d.,]+)\\s*([$€¥£]|USD|EUR|JPY|GBP)?");
-  
+
+    public Converter getConverter() {
+        return converter;
+    }
+
+    synchronized public void setConverter(Converter converter) {
+        if (converter == null){
+            throw new InvalidMoneyValueException(INVALID_CONVERTER);
+        }
+        this.converter = converter;
+    }
+
     public static class InvalidMoneyValueException extends RuntimeException {
         public InvalidMoneyValueException(String message) {
             super(message);
@@ -18,27 +31,32 @@ public class MoneyValue {
     }
   
     
-    public MoneyValue(double v, Currency currency) {
-        this(new BigDecimal(v), currency);
+    public MoneyValue(double v, Currency currency, Converter converter) {
+        this(new BigDecimal(v), currency, converter);
     }
   
-    public MoneyValue(int v, Currency currency) {
-        this(new BigDecimal(v), currency);
+    public MoneyValue(int v, Currency currency, Converter converter) {
+        this(new BigDecimal(v), currency, converter);
     }
 
 
 
-    public MoneyValue(BigDecimal amount, Currency currency) {
+    public MoneyValue(BigDecimal amount, Currency currency, Converter converter) {
         if (amount == null || currency == null) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        }else if (converter == null){
+            throw new InvalidMoneyValueException(INVALID_CONVERTER);
         }
         this.amount = amount.setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
+        this.converter = converter;
     }
   
-    public MoneyValue(String str) {
+    public MoneyValue(String str, Converter converter) {
         if (str == null || str.isEmpty()) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        }else if (converter == null){
+            throw new InvalidMoneyValueException(INVALID_CONVERTER);
         }
 
         // First ISO then amount
@@ -76,6 +94,7 @@ public class MoneyValue {
 
         this.amount = unroundedAmount.setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
+        this.converter = converter;
     }
 
     public Currency getCurrency() {
@@ -112,7 +131,7 @@ public class MoneyValue {
 
     public int compareTo(MoneyValue other) {
         if (this == other) return 0;
-        MoneyValue converted = Converter.convertTo(other, this.currency);
+        MoneyValue converted = converter.convertTo(other, this.currency);
         return this.amount.compareTo(converted.amount);
     }
 
@@ -125,21 +144,21 @@ public class MoneyValue {
 
     synchronized public MoneyValue add(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
         setAmount(this.amount.add(otherRightCurrency.amount));
         return this;
     }
 
     synchronized public MoneyValue subtract(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
         setAmount(this.amount.subtract(otherRightCurrency.amount));
         return this;
     }
 
     synchronized public MoneyValue multiply(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
         setAmount(this.amount.multiply(otherRightCurrency.amount));
         return this;
     }
@@ -149,7 +168,7 @@ public class MoneyValue {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = Converter.convertTo(other, this.currency);
+        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
         setAmount(this.amount.divide(otherRightCurrency.amount, 2, RoundingMode.HALF_UP));
         return this;
     }
