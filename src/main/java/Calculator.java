@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+
 public class Calculator {
     private MoneyValue mv_;
     private Converter cv_;
@@ -42,7 +44,7 @@ public class Calculator {
     }
 
     public Calculator divide(MoneyValue other) {
-        if(!validateMoneyValue(other))
+        if(!validateMoneyValue(other) || other.getAmount().equals(BigDecimal.valueOf(0.0)))
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
