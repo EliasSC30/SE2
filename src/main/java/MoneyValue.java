@@ -8,23 +8,15 @@ import java.util.regex.Pattern;
 public class MoneyValue {
     private BigDecimal amount;
     private final Currency currency;
-    private Converter converter;
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
     public static final String INVALID_CONVERTER = "Invalid Converter";
   
     private static final Pattern PATTERN_WITH_CURRENCY_FIRST = Pattern.compile("([$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
     private static final Pattern PATTERN_WITH_AMOUNT_FIRST = Pattern.compile("([\\d.,]+)\\s*([$€¥£]|USD|EUR|JPY|GBP)?");
 
-    public Converter getConverter() {
-        return converter;
-    }
 
-    synchronized public void setConverter(Converter converter) {
-        if (converter == null){
-            throw new InvalidMoneyValueException(INVALID_CONVERTER);
-        }
-        this.converter = converter;
-    }
+
+
 
     public static class InvalidMoneyValueException extends RuntimeException {
         public InvalidMoneyValueException(String message) {
@@ -33,32 +25,27 @@ public class MoneyValue {
     }
   
     
-    public MoneyValue(double v, Currency currency, Converter converter)  {
-        this(new BigDecimal(v), currency, converter);
+    public MoneyValue(double v, Currency currency)  {
+        this(new BigDecimal(v), currency);
     }
   
-    public MoneyValue(long v, Currency currency, Converter converter)  {
-        this(new BigDecimal(v), currency, converter);
+    public MoneyValue(long v, Currency currency)  {
+        this(new BigDecimal(v), currency);
     }
 
 
 
-    public MoneyValue(BigDecimal amount, Currency currency, Converter converter) {
+    public MoneyValue(BigDecimal amount, Currency currency) {
         if (amount == null || currency == null) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
-        }else if (converter == null){
-            throw new InvalidMoneyValueException(INVALID_CONVERTER);
         }
         this.amount = amount.setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
-        this.converter = converter;
     }
   
-    public MoneyValue(String str, Converter converter) {
+    public MoneyValue(String str) {
         if (str == null || str.isEmpty()) {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
-        }else if (converter == null){
-            throw new InvalidMoneyValueException(INVALID_CONVERTER);
         }
 
         // First ISO then amount
@@ -96,7 +83,6 @@ public class MoneyValue {
 
         this.amount = unroundedAmount.setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
-        this.converter = converter;
     }
 
     public Currency getCurrency() {
@@ -124,7 +110,7 @@ public class MoneyValue {
     }
     @Override
     public int hashCode() {
-        return Objects.hash(amount, currency, converter);
+        return Objects.hash(amount, currency);
     }
 
     public String toISOCode() {
@@ -154,22 +140,19 @@ public class MoneyValue {
 
     synchronized public MoneyValue add(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
-        setAmount(this.amount.add(otherRightCurrency.amount));
+        setAmount(this.amount.add(other.amount));
         return this;
     }
 
     synchronized public MoneyValue subtract(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
-        setAmount(this.amount.subtract(otherRightCurrency.amount));
+        setAmount(this.amount.subtract(other.amount));
         return this;
     }
 
     synchronized public MoneyValue multiply(MoneyValue other) {
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
-        setAmount(this.amount.multiply(otherRightCurrency.amount));
+        setAmount(this.amount.multiply(other.amount));
         return this;
     }
 
@@ -178,13 +161,15 @@ public class MoneyValue {
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
         validateForOperation(this, other);
-        MoneyValue otherRightCurrency = converter.convertTo(other, this.currency);
-        setAmount(this.amount.divide(otherRightCurrency.amount, 2, RoundingMode.HALF_UP));
+        setAmount(this.amount.divide(other.amount, 2, RoundingMode.HALF_UP));
         return this;
     }
 
     private static void validateForOperation(MoneyValue a, MoneyValue b) {
         if (a == null || b == null) {
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        } 
+        if(!a.getCurrency().equals(b.getCurrency())){
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
     }
