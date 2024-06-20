@@ -2,7 +2,7 @@ public class Main {
     public static void main(String[] args) {
         Converter cv = new Converter(new ExchangeRateProvider() {
             @Override
-            public Double getExchangeRate(Currency from, Currency to) {
+            public Double getExchangeRate(Currency from, Currency to, ExchangeRateType type) {
                 return 1.0;
             }
         });

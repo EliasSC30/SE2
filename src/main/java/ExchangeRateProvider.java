@@ -1,3 +1,10 @@
 public interface ExchangeRateProvider {
-    Double getExchangeRate(Currency from, Currency to);
+
+    public enum ExchangeRateType {
+        REALTIME,
+        MONTHLY,
+        DAILY
+    }
+
+    Double getExchangeRate(Currency from, Currency to, ExchangeRateType type);
 }

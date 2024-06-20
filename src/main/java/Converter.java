@@ -11,10 +11,15 @@ public class Converter {
 
     public MoneyValue convertTo(MoneyValue mv, Currency toCurrency)
     {
+        return convertTo(mv, toCurrency, ExchangeRateProvider.ExchangeRateType.REALTIME);
+    }
+
+    public MoneyValue convertTo(MoneyValue mv, Currency toCurrency, ExchangeRateProvider.ExchangeRateType type)
+    {
         if(mv == null || toCurrency == null)
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
 
-        BigDecimal toFactor = BigDecimal.valueOf(exchangeRateProvider.getExchangeRate(mv.getCurrency(), toCurrency));
+        BigDecimal toFactor = BigDecimal.valueOf(exchangeRateProvider.getExchangeRate(mv.getCurrency(), toCurrency, type));
 
         return new MoneyValue(mv.getAmount().multiply(toFactor), toCurrency, this);
     }
