@@ -1,17 +1,29 @@
 public class Main {
     public static void main(String[] args) {
-        MoneyValue m1 = MoneyValueFactory.createMoneyValue("1.0 £");
-        MoneyValue m2 = MoneyValueFactory.createMoneyValue("1.6 ¥");
+        Converter cv = new Converter(new ExchangeRateProvider() {
+            @Override
+            public Double getExchangeRate(Currency from, Currency to) {
+                return 1.0;
+            }
+        });
 
-        MoneyValue c1 = new  MoneyValue(1, Currency.US_DOLLAR);
-        MoneyValue c2 = new MoneyValue(1, Currency.EURO);
+        Calculator c = new Calculator(new MoneyValue("100$", cv), cv);
+        MoneyValue oneDollar = new MoneyValue(1.0, Currency.US_DOLLAR, cv);
+        MoneyValue twoDollar = new MoneyValue(2.0, Currency.US_DOLLAR, cv);
 
-        System.out.println(Converter.convertTo(c1, Currency.EURO));
-        System.out.println(Converter.convertTo(c2, Currency.US_DOLLAR));
+        System.out.println(c.getMoneyValue());
+        c.add(oneDollar);
+        System.out.println(c.getMoneyValue());
+        c.add(oneDollar).add(oneDollar);
+        System.out.println(c.getMoneyValue());
+        c.add(oneDollar).subtract(oneDollar);
+        System.out.println(c.getMoneyValue());
+        c.multiply(twoDollar);
+        System.out.println(c.getMoneyValue());
+        c.divide(twoDollar);
+        System.out.println(c.getMoneyValue());
+        c.multiply(twoDollar).divide(twoDollar).add(twoDollar).subtract(twoDollar);
+        System.out.println(c.getMoneyValue());
 
-        System.out.println(m1.add(m2).multiply(m1).toISOCode());
-        System.out.println(m1.subtract(m2).toISOCode());
-        System.out.println(m1.divide(m2).toISOCode());
-        System.out.println(m1.multiply(m2).toISOCode());
     }
 }

@@ -9,7 +9,6 @@ public class Converter {
         this.exchangeRateProvider = exchangeRateProvider;
     }
 
-
     public MoneyValue convertTo(MoneyValue mv, Currency toCurrency)
     {
         if(mv == null || toCurrency == null)
