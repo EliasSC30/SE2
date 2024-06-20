@@ -21,6 +21,6 @@ public class Converter {
 
         BigDecimal toFactor = BigDecimal.valueOf(exchangeRateProvider.getExchangeRate(mv.getCurrency(), toCurrency, type));
 
-        return new MoneyValue(mv.getAmount().multiply(toFactor), toCurrency, this);
+        return new MoneyValue(mv.getAmount().multiply(toFactor), toCurrency);
     }
 }
