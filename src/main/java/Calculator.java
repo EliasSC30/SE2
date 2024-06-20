@@ -9,13 +9,18 @@ public class Calculator {
         this.cv_ = cv;
     }
 
-    public MoneyValue getMoneyValue() {
-       return this.mv_;
-    }
+    public MoneyValue getMoneyValue() { return this.mv_; }
     public Converter getConverter() { return this.cv_; }
-
-    public void setMoneyValue(MoneyValue mv) { this.mv_ = mv; }
-    public void setConverter(Converter cv) { this.cv_ = cv; }
+    public void setMoneyValue(MoneyValue mv) {
+        if(mv == null)
+            throw new RuntimeException("Money value can't be null");
+        this.mv_ = mv;
+    }
+    public void setConverter(Converter cv) {
+        if(cv == null)
+            throw new RuntimeException("Converter can't be null");
+        this.cv_ = cv;
+    }
 
     public Calculator add(MoneyValue other) {
         if(!validateMoneyValue(other))
