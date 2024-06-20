@@ -1,4 +1,5 @@
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -135,9 +136,13 @@ public class MoneyValue {
     }
 
     public int compareTo(MoneyValue other) {
-        if (this == other) return 0;
-        MoneyValue converted = converter.convertTo(other, this.currency);
-        return this.amount.compareTo(converted.amount);
+        if(this == other) return 0;
+        if(other == null) return -1;
+
+        if(!this.amount.equals(other.getAmount()))
+            return other.getAmount().subtract(this.amount).round(new MathContext(2, RoundingMode.UP)).intValue();
+
+        return this.currency.compareTo(other.currency);
     }
 
     private void setAmount(BigDecimal amount){
