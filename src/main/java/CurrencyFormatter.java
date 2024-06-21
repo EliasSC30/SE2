@@ -4,35 +4,31 @@ import java.util.Locale;
 
 public class CurrencyFormatter {
 
-
     public static String formatCurrency(MoneyValue mv) {
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        nf.setCurrency(java.util.Currency.getInstance(mv.getCurrency().getIsoCode()));
-        return nf.format(mv.getAmount());
+        return formatCurrency(mv, Locale.getDefault());
     }
 
     public static String formatCurrency(MoneyValue mv, Locale locale) {
-        NumberFormat nf = NumberFormat.getCurrencyInstance(locale);
-        nf.setCurrency(java.util.Currency.getInstance(mv.getCurrency().getIsoCode()));
-        return nf.format(mv.getAmount());
+        Currency currency = mv.getCurrency();
+        CustomCurrencyFormat customFormat = new CustomCurrencyFormat(locale, currency.getSymbol());
+        return customFormat.format(mv.getAmount());
     }
+
     public static String formatISOCode(MoneyValue mv, Locale locale) {
-        NumberFormat nf = NumberFormat.getCurrencyInstance(locale);
-
-
         NumberFormat nfJustNumber = NumberFormat.getNumberInstance(locale);
         nfJustNumber.setRoundingMode(RoundingMode.HALF_UP);
         nfJustNumber.setMinimumFractionDigits(2);
 
-        java.util.Currency currency = java.util.Currency.getInstance(mv.getCurrency().getIsoCode());
-        nf.setCurrency(currency);
+        Currency currency = mv.getCurrency();
+        CustomCurrencyFormat customFormat = new CustomCurrencyFormat(locale, currency.getSymbol());
 
-        String formattedAmount = nf.format(mv.getAmount());
-        String symbol = currency.getSymbol(locale);
-        if (formattedAmount.startsWith(symbol)) {
-            return currency.getCurrencyCode() + " " + nfJustNumber.format(mv.getAmount());
+        String formattedAmount = customFormat.format(mv.getAmount());
+        String amount = nfJustNumber.format(mv.getAmount());
+
+        if (formattedAmount.startsWith(currency.getSymbol())) {
+            return currency.getIsoCode() + " " + amount;
         } else {
-            return nfJustNumber.format(mv.getAmount()) + " " + currency.getCurrencyCode();
+            return amount + " " + currency.getIsoCode();
         }
     }
 }
