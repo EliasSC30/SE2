@@ -69,19 +69,12 @@ public class FixedExchangeRateProvider implements ExchangeRateProvider {
         Double rate = null;
         String key = createKey(from, to);
 
-        switch (exchangeRateType) {
-            case REALTIME:
-                rate =  realtimeRates.get(key);
-                break;
-            case MONTHLY:
-                rate = monthlyRates.get(key);
-                break;
-            case DAILY:
-                rate = dailyRates.get(key);
-                break;
-            default:
-                throw new IllegalArgumentException("Exchange rate type not supported: " + exchangeRateType);
-        }
+        rate = switch (exchangeRateType) {
+            case REALTIME -> realtimeRates.get(key);
+            case MONTHLY -> monthlyRates.get(key);
+            case DAILY -> dailyRates.get(key);
+            default -> throw new IllegalArgumentException("Exchange rate type not supported: " + exchangeRateType);
+        };
 
         if (rate == null) {
             throw new IllegalArgumentException("Exchange rate not found for: " + from + " to " + to);

@@ -16,6 +16,7 @@ public class Calculator {
             throw new RuntimeException("Money value can't be null");
         this.mv_ = mv;
     }
+
     public void setConverter(Converter cv) {
         if(cv == null)
             throw new RuntimeException("Converter can't be null");
