@@ -1,7 +1,7 @@
 import java.math.BigDecimal;
 
 public class Calculator {
-    private MoneyValue mv_;
+    private MoneyValueClient mv_;
     private ConverterClient cv_;
 
     public Calculator(MoneyValue mv, Converter cv) {
@@ -9,7 +9,7 @@ public class Calculator {
         this.cv_ = cv;
     }
 
-    public MoneyValue getMoneyValue() { return this.mv_; }
+    public MoneyValueClient getMoneyValueClient() { return this.mv_; }
     public ConverterClient getConverter() { return this.cv_; }
     public void setMoneyValue(MoneyValue mv) {
         if(mv == null)

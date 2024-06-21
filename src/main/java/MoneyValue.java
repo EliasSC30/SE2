@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class MoneyValue {
+public final class MoneyValue implements MoneyValueClient {
     private BigDecimal amount;
     private final Currency currency;
     public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
@@ -19,8 +19,7 @@ public final class MoneyValue {
             super(message);
         }
     }
-  
-    
+
     public MoneyValue(double v, Currency currency)  {
         this(new BigDecimal(v), currency);
     }
@@ -126,13 +125,6 @@ public final class MoneyValue {
         return this.currency.compareTo(other.currency);
     }
 
-    private void setAmount(BigDecimal amount){
-        if (amount == null) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
-        }
-        this.amount = amount.setScale(2, RoundingMode.HALF_UP);
-    }
-
     synchronized public MoneyValue add(MoneyValue other) {
         validateForOperation(this, other);
         setAmount(this.amount.add(other.amount));
@@ -167,5 +159,12 @@ public final class MoneyValue {
         if(!a.getCurrency().equals(b.getCurrency())){
             throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
         }
+    }
+
+    private void setAmount(BigDecimal amount){
+        if (amount == null) {
+            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+        }
+        this.amount = amount.setScale(2, RoundingMode.HALF_UP);
     }
 }
