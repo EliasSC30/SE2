@@ -84,7 +84,7 @@ public class Calculator {
      * @throws MoneyValue.InvalidMoneyValueException if the specified MoneyValue is invalid
      */
     public Calculator add(MoneyValue other) {
-        if (isMoneyValueInvalid(other)) {
+        if (isMoneyValueValid(other)) {
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
         }
 
@@ -105,7 +105,7 @@ public class Calculator {
      * @throws MoneyValue.InvalidMoneyValueException if the specified MoneyValue is invalid
      */
     public Calculator multiply(MoneyValue other) {
-        if (isMoneyValueInvalid(other)) {
+        if (isMoneyValueValid(other)) {
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
         }
 
@@ -126,7 +126,7 @@ public class Calculator {
      * @throws MoneyValue.InvalidMoneyValueException if the specified MoneyValue is invalid
      */
     public Calculator subtract(MoneyValue other) {
-        if (isMoneyValueInvalid(other)) {
+        if (isMoneyValueValid(other)) {
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
         }
 
@@ -147,7 +147,7 @@ public class Calculator {
      * @throws MoneyValue.InvalidMoneyValueException if the specified MoneyValue is invalid or zero
      */
     public Calculator divide(MoneyValue other) {
-        if (isMoneyValueInvalid(other) || other.getAmount().equals(BigDecimal.valueOf(0.0))) {
+        if (isMoneyValueValid(other) || other.getAmount().equals(BigDecimal.valueOf(0.0))) {
             throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
         }
 
@@ -165,7 +165,7 @@ public class Calculator {
      * @param mv the MoneyValue to validate
      * @return true if the MoneyValue is valid, false otherwise
      */
-    private boolean isMoneyValueInvalid(MoneyValue mv) {
+    private boolean isMoneyValueValid(MoneyValue mv) {
         return mv == null;
     }
 }
