@@ -14,10 +14,6 @@ public final class MoneyValue {
     private static final Pattern PATTERN_WITH_CURRENCY_FIRST = Pattern.compile("([$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
     private static final Pattern PATTERN_WITH_AMOUNT_FIRST = Pattern.compile("([\\d.,]+)\\s*([$€¥£]|USD|EUR|JPY|GBP)?");
 
-
-
-
-
     public static class InvalidMoneyValueException extends RuntimeException {
         public InvalidMoneyValueException(String message) {
             super(message);
@@ -32,7 +28,6 @@ public final class MoneyValue {
     public MoneyValue(long v, Currency currency)  {
         this(new BigDecimal(v), currency);
     }
-
 
 
     public MoneyValue(BigDecimal amount, Currency currency) {
