@@ -12,6 +12,7 @@ public class Main {
         MoneyValue twoDollar = new MoneyValue(2.0, Currency.US_DOLLAR);
 
         System.out.println(c.getMoneyValueClient());
+
         c.add(oneDollar);
         System.out.println(c.getMoneyValueClient());
         c.add(oneDollar).add(oneDollar);
