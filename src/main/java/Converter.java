@@ -1,8 +1,6 @@
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
-public class Converter {
+public class Converter implements ConverterClient {
     private ExchangeRateProvider exchangeRateProvider;
 
     Converter(ExchangeRateProvider exchangeRateProvider){

@@ -2,7 +2,7 @@ import java.math.BigDecimal;
 
 public class Calculator {
     private MoneyValue mv_;
-    private Converter cv_;
+    private ConverterClient cv_;
 
     public Calculator(MoneyValue mv, Converter cv) {
         this.mv_ = mv;
@@ -10,7 +10,7 @@ public class Calculator {
     }
 
     public MoneyValue getMoneyValue() { return this.mv_; }
-    public Converter getConverter() { return this.cv_; }
+    public ConverterClient getConverter() { return this.cv_; }
     public void setMoneyValue(MoneyValue mv) {
         if(mv == null)
             throw new RuntimeException("Money value can't be null");
