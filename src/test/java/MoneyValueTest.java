@@ -1,3 +1,5 @@
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -7,6 +9,9 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -695,6 +700,84 @@ class MoneyValueTest {
 
             // Then
             assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+        }
+    }
+
+    @Nested
+    public class MoneyValueSynchronizedTests {
+        private int numberOfThreads;
+        private ExecutorService service;
+        private CountDownLatch latch;
+
+        @BeforeEach()
+        void beforeEach() {
+            numberOfThreads = 10;
+            service = Executors.newFixedThreadPool(10);
+            latch = new CountDownLatch(numberOfThreads);
+        }
+
+        @Test
+        public void testAddMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(0.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(10.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.add(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testSubtractMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(10.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(0.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.subtract(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testMultiplyMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(1024.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.multiply(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testDivideMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(2048.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(2.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.divide(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
         }
     }
 }
