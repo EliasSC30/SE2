@@ -32,9 +32,7 @@ public class ConverterTest {
         @Test
         public void testConvertToWithNullMoneyValue() {
             // Given & When
-            Exception exception = assertThrows(Exception.class, () -> {
-                converter.convertTo(null, Currency.EURO);
-            });
+            Exception exception = assertThrows(Exception.class, () -> converter.convertTo(null, Currency.EURO));
 
             // Then
             assertEquals(RuntimeException.class, exception.getClass());
@@ -44,13 +42,11 @@ public class ConverterTest {
         @Test
         public void testConvertToWithNullCurrency() {
             // Given & When
-            Exception exception = assertThrows(Exception.class, () -> {
-                converter.convertTo(mv, null);
-            });
+            Exception exception = assertThrows(Exception.class, () -> converter.convertTo(mv, null));
 
             // Then
             assertEquals(RuntimeException.class, exception.getClass());
-            assertEquals("Invalid Money Value", exception.getMessage());
+            assertEquals("Converter can not be null", exception.getMessage());
         }
     }
 
@@ -124,13 +120,23 @@ public class ConverterTest {
         }
 
         @Test
+        public void testConvertToWithTypeCurrencyNull () {
+            // When
+            Exception exception = assertThrows(Exception.class, () -> converter.convertTo(mv, null, ExchangeRateProvider.ExchangeRateType.MONTHLY));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals("Converter can not be null", exception.getMessage());
+        }
+
+        @Test
         public void testConvertToWithTypeNull () {
             // When
             Exception exception = assertThrows(Exception.class, () -> converter.convertTo(mv, Currency.EURO, null));
 
             // Then
             assertEquals(exception.getClass(), RuntimeException.class);
-            assertEquals("ExchangeRate Type is null", exception.getMessage());
+            assertEquals("ExchangeRateType can not be null", exception.getMessage());
         }
     }
 }
