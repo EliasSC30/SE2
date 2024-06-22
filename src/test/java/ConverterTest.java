@@ -121,5 +121,15 @@ public class ConverterTest {
             assertEquals(Currency.EURO, resultDaily.getCurrency());
             assertEquals(expectedAmount, resultDaily.getAmount());
         }
+
+        @Test
+        public void testConvertToWithTypeNull () {
+            // When
+            Exception exception = assertThrows(MessageHandling.InvalidConverterException.class, () -> converter.convertTo(mv, Currency.EURO, null));
+
+            // Then
+            assertEquals(exception.getClass(), MessageHandling.InvalidConverterException.class);
+            //assertEquals(exception.getMessage(), MessageHandling.EXCHANGE_RATE_TYPE_NULL);
+        }
     }
 }
