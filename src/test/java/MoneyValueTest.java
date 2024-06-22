@@ -480,7 +480,7 @@ class MoneyValueTest {
             MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.add(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
         }
 
         @Test
@@ -538,7 +538,7 @@ class MoneyValueTest {
             MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.subtract(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
         }
 
         @Test
@@ -595,7 +595,7 @@ class MoneyValueTest {
             MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.multiply(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
         }
 
         @Test
@@ -667,7 +667,7 @@ class MoneyValueTest {
             MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
         }
 
         @Test

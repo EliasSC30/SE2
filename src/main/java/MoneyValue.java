@@ -148,7 +148,7 @@ public final class MoneyValue implements MoneyValueClient {
             throw new MessageHandling.InvalidMoneyValueException(MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
         } 
         if(!a.getCurrency().equals(b.getCurrency())){
-            throw new MessageHandling.InvalidMoneyValueException(MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            throw new MessageHandling.InvalidMoneyValueException(MessageHandling.CURRENCIES_NOT_EQUAL);
         }
     }
 
