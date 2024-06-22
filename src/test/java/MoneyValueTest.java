@@ -2,10 +2,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -425,8 +425,6 @@ class MoneyValueTest {
           assertEquals(0, moneyValue1.compareTo(moneyValue2));
       }
 
-
-
       @Test
       public void testCompareToGreaterValue() {
           // Given
@@ -671,6 +669,14 @@ class MoneyValueTest {
             // When & Then
             assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));
         }
+    }
+    @Test
+    void testHashCode(){
+        // Given
+        MoneyValue oneDollar = new MoneyValue(1.0, Currency.US_DOLLAR);
+
+        //When & Then
+        assertEquals(oneDollar.hashCode(), Objects.hash(1.0, Currency.US_DOLLAR.getIsoCode()));
     }
 
     @Test

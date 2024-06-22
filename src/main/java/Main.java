@@ -1,5 +1,5 @@
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Converter cv = new Converter(new ExchangeRateProvider() {
             @Override
             public Double getExchangeRate(Currency from, Currency to, ExchangeRateType type) {

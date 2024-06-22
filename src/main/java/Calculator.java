@@ -29,7 +29,7 @@ public class Calculator {
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                                             other : cv_.convertTo(other, mv_.getCurrency());
-        mv_ = mv_.add(otherInSameCurrency);
+        mv_.add(otherInSameCurrency);
         return this;
     }
 
@@ -39,7 +39,7 @@ public class Calculator {
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());
-        mv_ = mv_.multiply(otherInSameCurrency);
+        mv_.multiply(otherInSameCurrency);
         return this;
     }
 
@@ -49,7 +49,7 @@ public class Calculator {
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());
-        mv_ = mv_.subtract(otherInSameCurrency);
+        mv_.subtract(otherInSameCurrency);
         return this;
     }
 
@@ -59,7 +59,7 @@ public class Calculator {
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());
-        mv_ = mv_.divide(otherInSameCurrency);
+        mv_.divide(otherInSameCurrency);
         return this;
     }
 

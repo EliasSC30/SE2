@@ -102,7 +102,7 @@ public final class MoneyValue implements MoneyValueClient {
     }
     @Override
     public int hashCode() {
-        return Objects.hash(amount, currency);
+        return Objects.hash(amount.doubleValue(), currency.getIsoCode());
     }
 
     public String toISOCode() {

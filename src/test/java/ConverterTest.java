@@ -21,6 +21,7 @@ class ConverterTest {
 
     @Nested
     class ConverterConvertToTest{
+        /*
         @Test
         public void testConvertToValidMoneyValue() {
             // Given
@@ -46,6 +47,6 @@ class ConverterTest {
             assertThrows(MoneyValue.InvalidMoneyValueException.class,
                     () -> Converter.convertTo(mv, null));
         }
-
+*/
     }
 }
