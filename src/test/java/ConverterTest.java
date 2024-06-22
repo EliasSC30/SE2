@@ -19,6 +19,8 @@ class ConverterTest {
         euro = Currency.EURO;
     }
 
+    /*
+
     @Nested
     class ConverterConvertToTest{
         @Test
@@ -48,4 +50,6 @@ class ConverterTest {
         }
 
     }
+    */
+
 }

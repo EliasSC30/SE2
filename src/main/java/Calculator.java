@@ -25,7 +25,7 @@ public class Calculator {
 
     public Calculator add(MoneyValue other) {
         if(!validateMoneyValue(other))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new MessageHandling.InvalidMoneyValueException(MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                                             other : cv_.convertTo(other, mv_.getCurrency());
@@ -35,7 +35,7 @@ public class Calculator {
 
     public Calculator multiply(MoneyValue other) {
         if(!validateMoneyValue(other))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new MessageHandling.InvalidMoneyValueException(MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());
@@ -45,7 +45,7 @@ public class Calculator {
 
     public Calculator subtract(MoneyValue other) {
         if(!validateMoneyValue(other))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new MessageHandling.InvalidMoneyValueException(MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());
@@ -55,7 +55,7 @@ public class Calculator {
 
     public Calculator divide(MoneyValue other) {
         if(!validateMoneyValue(other) || other.getAmount().equals(BigDecimal.valueOf(0.0)))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new MessageHandling.InvalidMoneyValueException(MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());

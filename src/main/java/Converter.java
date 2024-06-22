@@ -15,7 +15,7 @@ public class Converter implements ConverterClient {
     public MoneyValue convertTo(MoneyValue mv, Currency toCurrency, ExchangeRateProvider.ExchangeRateType type)
     {
         if(mv == null || toCurrency == null)
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new MessageHandling.InvalidMoneyValueException(MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
 
         BigDecimal toFactor = BigDecimal.valueOf(exchangeRateProvider.getExchangeRate(mv.getCurrency(), toCurrency, type));
 
