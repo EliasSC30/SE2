@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.management.RuntimeOperationsException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -38,6 +37,7 @@ public class ConverterTest {
             });
 
             // Then
+            assertEquals(RuntimeException.class, exception.getClass());
             assertEquals("Invalid Money Value", exception.getMessage());
         }
 
@@ -49,6 +49,7 @@ public class ConverterTest {
             });
 
             // Then
+            assertEquals(RuntimeException.class, exception.getClass());
             assertEquals("Invalid Money Value", exception.getMessage());
         }
     }
@@ -129,7 +130,7 @@ public class ConverterTest {
 
             // Then
             assertEquals(exception.getClass(), RuntimeException.class);
-            assertEquals("ExchangeRate Type is null", exception.getMessage() );
+            assertEquals("ExchangeRate Type is null", exception.getMessage());
         }
     }
 }
