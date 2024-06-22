@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.management.RuntimeOperationsException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -14,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ConverterTest {
-
     @Mock
     private ExchangeRateProvider exchangeRateProvider;
 
@@ -33,23 +33,23 @@ public class ConverterTest {
         @Test
         public void testConvertToWithNullMoneyValue() {
             // Given & When
-            Exception exception = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> {
+            Exception exception = assertThrows(Exception.class, () -> {
                 converter.convertTo(null, Currency.EURO);
             });
 
             // Then
-            assertEquals(MessageHandling.INVALID_MONEY_VALUE_AS_STRING, exception.getMessage());
+            assertEquals("Invalid Money Value", exception.getMessage());
         }
 
         @Test
         public void testConvertToWithNullCurrency() {
             // Given & When
-            Exception exception = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> {
+            Exception exception = assertThrows(Exception.class, () -> {
                 converter.convertTo(mv, null);
             });
 
             // Then
-            assertEquals(MessageHandling.INVALID_MONEY_VALUE_AS_STRING, exception.getMessage());
+            assertEquals("Invalid Money Value", exception.getMessage());
         }
     }
 
@@ -125,11 +125,11 @@ public class ConverterTest {
         @Test
         public void testConvertToWithTypeNull () {
             // When
-            Exception exception = assertThrows(MessageHandling.InvalidConverterException.class, () -> converter.convertTo(mv, Currency.EURO, null));
+            Exception exception = assertThrows(Exception.class, () -> converter.convertTo(mv, Currency.EURO, null));
 
             // Then
-            assertEquals(exception.getClass(), MessageHandling.InvalidConverterException.class);
-            //assertEquals(exception.getMessage(), MessageHandling.EXCHANGE_RATE_TYPE_NULL);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals("ExchangeRate Type is null", exception.getMessage() );
         }
     }
 }

@@ -17,6 +17,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MoneyValueTest {
 
+    private final String INVALID_MONEY_VALUE = "Invalid Money Value";
+    private final String CURRENCIES_NOT_EQUAL = "Currencies are not equal for operation";
+    private final String DIVIDE_BY_ZERO = "Can not divide by zero";
+
     @Nested
     class testMoneyValueConstructor{
         @Test
@@ -93,8 +97,12 @@ class MoneyValueTest {
             double amount = 100.0;
             Currency currency = null;
 
-            // When & Then
-            assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(amount, currency));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -103,8 +111,12 @@ class MoneyValueTest {
             BigDecimal amount = null;
             Currency currency = Currency.US_DOLLAR;
 
-            // When & Then
-            assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(amount, currency));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -158,8 +170,12 @@ class MoneyValueTest {
             // Given
             String str = "100.0";
 
-            // When & Then
-            assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(str));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -168,7 +184,12 @@ class MoneyValueTest {
             String str = "100.0 (";
 
             // When & Then
-            assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(str));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -190,8 +211,12 @@ class MoneyValueTest {
             // Given
             String str = "$";
 
-            // When & Then
-            assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(str));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -482,10 +507,11 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.EURO);
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.add(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.add(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -509,10 +535,11 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = null;
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.add(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.add(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
     }
@@ -540,10 +567,11 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.EURO);
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.subtract(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.subtract(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -567,10 +595,11 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = null;
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.subtract(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.subtract(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
     }
 
@@ -597,10 +626,11 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = new MoneyValue(5.0, Currency.EURO);
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.multiply(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.multiply(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -624,10 +654,11 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = null;
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.multiply(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.multiply(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -669,10 +700,11 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(2.0, Currency.US_DOLLAR);
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.divide(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.CURRENCIES_NOT_EQUAL);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -696,10 +728,11 @@ class MoneyValueTest {
             MoneyValue moneyValue2 = new MoneyValue(0.0, Currency.US_DOLLAR);
 
             // When
-            MessageHandling.InvalidMoneyValueException c = assertThrows(MessageHandling.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.divide(moneyValue2));
 
             // Then
-            assertEquals(c.getMessage(), MessageHandling.INVALID_MONEY_VALUE_AS_STRING);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(DIVIDE_BY_ZERO, exception.getMessage() );
         }
     }
 
