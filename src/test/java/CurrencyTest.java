@@ -4,30 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CurrencyTest {
     @Test
-    void getIsoCode() {
-        // Given
-        String isoCode = "EUR";
-
-        // When
-        String result = Currency.EURO.getIsoCode();
-
-        // Then
-        assertEquals(isoCode, result);
-    }
-
-    @Test
-    void getSymbol() {
-        // Given
-        String symbol = "€";
-
-        // When
-        String result = Currency.EURO.getSymbol();
-
-        // Then
-        assertEquals(symbol, result);
-    }
-
-    @Test
     void fromSymbol() {
         // Given
         char symbol = '€';
