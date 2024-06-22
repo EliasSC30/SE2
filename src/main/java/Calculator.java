@@ -34,7 +34,7 @@ public class Calculator {
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                                             other : cv_.convertTo(other, mv_.getCurrency());
-        mv_ = mv_.add(otherInSameCurrency);
+        mv_.add(otherInSameCurrency);
         return this;
     }
 

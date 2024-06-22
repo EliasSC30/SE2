@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -328,4 +329,45 @@ class CalculatorTest {
             assertEquals(expectedResult.getAmount(), y.getAmount());
         }
     }
+
+    @Nested
+    class testThread {
+        private final int numberOfThreads = 10;
+        private ExecutorService service;
+        private CountDownLatch latch;
+        private Thread[] threads;
+        private static MoneyValue oneDollar;
+        private static int nrOfThreads;
+
+        @BeforeAll
+        public static void beforeAll() {
+            oneDollar = new MoneyValue("$1");
+            nrOfThreads = 10;
+        }
+
+        @BeforeEach
+        void beforeEach() {
+            threads = new Thread[nrOfThreads];
+        }
+        @Test
+        public void testAddMultiThreadingSafe() throws InterruptedException {
+            // Given
+            MoneyValue expectedResult = new MoneyValue("$110");
+
+            // When
+            for(int i = 0; i < threads.length; ++i) {
+                threads[i] = new Thread(() -> calculator.add(oneDollar));
+                threads[i].run();
+            }
+
+            for(Thread t: threads)
+                t.join();
+
+            // Then
+            MoneyValue mv = (MoneyValue) calculator.getMoneyValueClient();
+            assertEquals(expectedResult.getAmount(), mv.getAmount());
+            assertEquals(expectedResult.getCurrency(), mv.getCurrency());
+        }
+    }
+
 }
