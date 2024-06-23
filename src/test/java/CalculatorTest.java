@@ -357,7 +357,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.add(oneDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -377,7 +377,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.subtract(oneDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -398,7 +398,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.multiply(twoDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -421,7 +421,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.divide(twoDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -441,7 +441,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.add(oneDollar).add(oneDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -461,7 +461,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.subtract(oneDollar).subtract(oneDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -482,7 +482,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.multiply(twoDollar).multiply(twoDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -505,7 +505,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.divide(twoDollar).divide(twoDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)
@@ -526,7 +526,7 @@ class CalculatorTest {
             // When
             for(int i = 0; i < threads.length; ++i) {
                 threads[i] = new Thread(() -> calculator.add(twoDollar).subtract(twoDollar).multiply(twoDollar).divide(twoDollar));
-                threads[i].run();
+                threads[i].start();
             }
 
             for(Thread t: threads)

@@ -22,13 +22,13 @@ public class Calculator {
         this.mv_ = mv;
     }
 
-    public void setConverter(Converter cv) {
+     public void setConverter(Converter cv) {
         if(cv == null)
             throw new RuntimeException(ConstErrorMessages.CONVERTER_NULL);
         this.cv_ = cv;
     }
 
-    public Calculator add(MoneyValue other) {
+    synchronized public Calculator add(MoneyValue other) {
         if(!validateMoneyValue(other))
             throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
@@ -38,7 +38,7 @@ public class Calculator {
         return this;
     }
 
-    public Calculator multiply(MoneyValue other) {
+    synchronized public Calculator multiply(MoneyValue other) {
         if(!validateMoneyValue(other))
             throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
@@ -48,7 +48,7 @@ public class Calculator {
         return this;
     }
 
-    public Calculator subtract(MoneyValue other) {
+    synchronized public Calculator subtract(MoneyValue other) {
         if(!validateMoneyValue(other))
             throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
@@ -58,7 +58,7 @@ public class Calculator {
         return this;
     }
 
-    public Calculator divide(MoneyValue other) {
+    synchronized public Calculator divide(MoneyValue other) {
         if(!validateMoneyValue(other) || other.getAmount().equals(BigDecimal.valueOf(0.0)))
             throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
