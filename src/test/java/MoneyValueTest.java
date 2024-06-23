@@ -152,6 +152,62 @@ class MoneyValueTest {
         }
 
         @Test
+        public void testMoneyValueConstructorFrontStringLargeEurAmountWithComma() {
+            // Given
+            String str = "1,200.00 €";
+            BigDecimal expectedAmount = new BigDecimal(1200.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.EURO, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorFrontStringLargerEurAmountWithComma() {
+            // Given
+            String str = "1,200,000.00 €";
+            BigDecimal expectedAmount = new BigDecimal(1200000.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.EURO, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorFrontStringLargeUSAmountWithComma() {
+            // Given
+            String str = "$1.200,00";
+            BigDecimal expectedAmount = new BigDecimal(1200.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorFrontStringLargerUSAmountWithComma() {
+            // Given
+            String str = "$1.200.000,00";
+            BigDecimal expectedAmount = new BigDecimal(1200000.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
+
+        @Test
         public void testMoneyValueConstructorBackString() {
             // Given
             String str = "100.0 $";
