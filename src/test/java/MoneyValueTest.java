@@ -352,18 +352,12 @@ class MoneyValueTest {
     }
 
     @Test
-    public void testHashCode() {
+    void testHashCode(){
         // Given
-        BigDecimal amount = new BigDecimal(123.456);
-        Currency currency = Currency.EURO;
-        MoneyValue moneyValue = new MoneyValue(amount, currency);
-        int hashCodeResult = Objects.hash(amount.doubleValue(), currency);
+        MoneyValue oneDollar = new MoneyValue(1.0, Currency.US_DOLLAR);
 
-        // When
-        int hashCode = moneyValue.hashCode();
-
-        // Then
-        assertEquals(hashCodeResult, hashCode);
+        //When & Then
+        assertEquals(oneDollar.hashCode(), Objects.hash(1.0, Currency.US_DOLLAR.getIsoCode()));
     }
 
     @Nested

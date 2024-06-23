@@ -102,7 +102,7 @@ public final class MoneyValue implements MoneyValueClient {
         if (currency == Currency.EURO) {
             return formattedAmount.replace(".", ",") + " " + currency.getIsoCode();
         }
-        return amount + " " + currency;
+        return amount + " " + currency.getIsoCode();
     }
 
     public String toISOCodePrefix() {
