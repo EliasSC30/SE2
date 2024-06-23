@@ -1,6 +1,6 @@
 public interface ExchangeRateProvider {
 
-    public enum ExchangeRateType {
+    enum ExchangeRateType {
         REALTIME,
         MONTHLY,
         DAILY

@@ -64,6 +64,13 @@ public class FixedExchangeRateProvider implements ExchangeRateProvider {
 
     @Override
     public Double getExchangeRate(Currency from, Currency to, ExchangeRateType exchangeRateType) {
+        if (from == null)
+            throw new RuntimeException(ConstErrorMessages.CURRENCY_NULL);
+        else if (to == null)
+            throw new RuntimeException(ConstErrorMessages.CURRENCY_NULL);
+        else if (exchangeRateType == null)
+            throw new RuntimeException(ConstErrorMessages.EXCHANGE_RATE_TYPE_NULL);
+
         if(from.equals(to)) return 1.0;
 
         Double rate = null;

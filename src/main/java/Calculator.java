@@ -5,27 +5,32 @@ public class Calculator {
     private ConverterClient cv_;
 
     public Calculator(MoneyValue mv, Converter cv) {
+        if (mv == null)
+            throw new RuntimeException(ConstErrorMessages.MONEY_VALUE_NULL);
+        else if (cv == null)
+            throw new RuntimeException(ConstErrorMessages.CONVERTER_NULL);
+
         this.mv_ = mv;
         this.cv_ = cv;
     }
 
     public MoneyValueClient getMoneyValueClient() { return this.mv_; }
-    public ConverterClient getConverter() { return this.cv_; }
+    public ConverterClient getConverterClient() { return this.cv_; }
     public void setMoneyValue(MoneyValue mv) {
         if(mv == null)
-            throw new RuntimeException("Money value can't be null");
+            throw new RuntimeException(ConstErrorMessages.MONEY_VALUE_NULL);
         this.mv_ = mv;
     }
 
     public void setConverter(Converter cv) {
         if(cv == null)
-            throw new RuntimeException("Converter can't be null");
+            throw new RuntimeException(ConstErrorMessages.CONVERTER_NULL);
         this.cv_ = cv;
     }
 
     public Calculator add(MoneyValue other) {
         if(!validateMoneyValue(other))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                                             other : cv_.convertTo(other, mv_.getCurrency());
@@ -35,7 +40,7 @@ public class Calculator {
 
     public Calculator multiply(MoneyValue other) {
         if(!validateMoneyValue(other))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());
@@ -45,7 +50,7 @@ public class Calculator {
 
     public Calculator subtract(MoneyValue other) {
         if(!validateMoneyValue(other))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());
@@ -55,7 +60,7 @@ public class Calculator {
 
     public Calculator divide(MoneyValue other) {
         if(!validateMoneyValue(other) || other.getAmount().equals(BigDecimal.valueOf(0.0)))
-            throw new MoneyValue.InvalidMoneyValueException(MoneyValue.INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
         MoneyValue otherInSameCurrency = mv_.getCurrency() == other.getCurrency() ?
                 other : cv_.convertTo(other, mv_.getCurrency());

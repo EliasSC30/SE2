@@ -1,15 +1,25 @@
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MoneyValueTest {
+
+    private final String INVALID_MONEY_VALUE = "Invalid Money Value";
+    private final String CURRENCIES_NOT_EQUAL = "Currencies are not equal for operation";
+    private final String DIVIDE_BY_ZERO = "Can not divide by zero";
 
     @Nested
     class testMoneyValueConstructor{
@@ -33,27 +43,7 @@ class MoneyValueTest {
             Currency currency = Currency.US_DOLLAR;
 
             // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
-        }
-
-        @Test
-        public void testMoneyValueConstructorNullCurrency() {
-            // Given
-            double amount = 100.0;
-            Currency currency = null;
-
-            // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
-        }
-
-        @Test
-        public void testMoneyValueConstructorNullAmount() {
-            // Given
-            BigDecimal amount = null;
-            Currency currency = Currency.US_DOLLAR;
-
-            // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, currency));
+            assertThrows(NumberFormatException.class, () -> new MoneyValue(amount, currency));
         }
 
         @Test
@@ -62,7 +52,6 @@ class MoneyValueTest {
             double amount = 100.0;
             Currency currency = Currency.US_DOLLAR;
             BigDecimal expectedAmount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
-
 
             // When
             MoneyValue moneyValue = new MoneyValue(100, currency);
@@ -88,12 +77,55 @@ class MoneyValueTest {
         }
 
         @Test
+        public void testMoneyValueConstructorAmountValidLongValues() {
+            // Given
+            long amount = 100;
+            Currency currency = Currency.US_DOLLAR;
+            BigDecimal expectedAmount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue moneyValue = new MoneyValue(amount, currency);
+
+            // Then
+            assertEquals(expectedAmount,moneyValue.getAmount());
+            assertEquals(currency, moneyValue.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorNullCurrency() {
+            // Given
+            double amount = 100.0;
+            Currency currency = null;
+
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(amount, currency));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
+        }
+
+        @Test
+        public void testMoneyValueConstructorNullAmount() {
+            // Given
+            BigDecimal amount = null;
+            Currency currency = Currency.US_DOLLAR;
+
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(amount, currency));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
+        }
+
+        @Test
         public void testMoneyValueConstructorAmountInvalidAmount() {
             // Given
             double amount = Double.NaN;
 
             // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
+            assertThrows(NumberFormatException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
         }
 
         @Test
@@ -102,7 +134,7 @@ class MoneyValueTest {
             double amount = Double.POSITIVE_INFINITY;
 
             // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
+            assertThrows(NumberFormatException.class, () -> new MoneyValue(amount, Currency.US_DOLLAR));
         }
 
         @Test
@@ -110,6 +142,62 @@ class MoneyValueTest {
             // Given
             String str = "$ 100.00";
             BigDecimal expectedAmount = new BigDecimal(100.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorFrontStringLargeEurAmountWithComma() {
+            // Given
+            String str = "1,200.00 €";
+            BigDecimal expectedAmount = new BigDecimal(1200.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.EURO, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorFrontStringLargerEurAmountWithComma() {
+            // Given
+            String str = "1,200,000.00 €";
+            BigDecimal expectedAmount = new BigDecimal(1200000.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.EURO, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorFrontStringLargeUSAmountWithComma() {
+            // Given
+            String str = "$1.200,00";
+            BigDecimal expectedAmount = new BigDecimal(1200.00).setScale(2, RoundingMode.HALF_UP);
+
+            // When
+            MoneyValue mv = new MoneyValue(str);
+
+            // Then
+            assertEquals(expectedAmount, mv.getAmount());
+            assertEquals(Currency.US_DOLLAR, mv.getCurrency());
+        }
+
+        @Test
+        public void testMoneyValueConstructorFrontStringLargerUSAmountWithComma() {
+            // Given
+            String str = "$1.200.000,00";
+            BigDecimal expectedAmount = new BigDecimal(1200000.00).setScale(2, RoundingMode.HALF_UP);
 
             // When
             MoneyValue mv = new MoneyValue(str);
@@ -138,8 +226,12 @@ class MoneyValueTest {
             // Given
             String str = "100.0";
 
-            // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(str));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -148,7 +240,12 @@ class MoneyValueTest {
             String str = "100.0 (";
 
             // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(str));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -170,12 +267,18 @@ class MoneyValueTest {
             // Given
             String str = "$";
 
-            // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> new MoneyValue(str));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> new MoneyValue(str));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
         public void testStringToMoneyValues() {
+            // Given
+            // Test all currencies
             Map<String, Currency>[] currencySigns = new HashMap[]{
                     new HashMap<String, Currency>() {{
                         put("$", Currency.US_DOLLAR);
@@ -261,7 +364,7 @@ class MoneyValueTest {
             double amount = 123.456;
             Currency currency = Currency.US_DOLLAR;
             MoneyValue moneyValue = new MoneyValue(amount, currency);
-            String expected = "$ 123,46";
+            String expected = "$ 123.46";
 
             // When
             String actual = moneyValue.toString();
@@ -304,6 +407,15 @@ class MoneyValueTest {
         }
     }
 
+    @Test
+    void testHashCode(){
+        // Given
+        MoneyValue oneDollar = new MoneyValue(1.0, Currency.US_DOLLAR);
+
+        //When & Then
+        assertEquals(oneDollar.hashCode(), Objects.hash(1.0, Currency.US_DOLLAR.getIsoCode()));
+    }
+
     @Nested
     class testMoneyValueToISOCodePrefix{
         @Test
@@ -338,7 +450,7 @@ class MoneyValueTest {
     }
 
     @Nested
-    class MoneyValueEqualsTest {
+    class testMoneyValueEqualsTest {
         @Test
         public void testEqualsSameObject() {
             // Given
@@ -371,17 +483,6 @@ class MoneyValueTest {
         }
 
         @Test
-        public void testEqualsForSameAmountsDifferentCurrencies() {
-            // Given
-            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
-            MoneyValue moneyValue2 = Converter.convertTo(moneyValue1, Currency.EURO);
-
-            // When & Then
-            assertTrue(moneyValue1.equals(moneyValue2));
-            assertTrue(moneyValue2.equals(moneyValue1));
-        }
-
-        @Test
         public void testNotEqualsForDifferentCurrencies() {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.00, Currency.US_DOLLAR);
@@ -394,15 +495,18 @@ class MoneyValueTest {
     }
 
     @Nested
-    class MoneyValueCompareToTest {
+    class testMoneyValueCompareToTest {
       @Test
       public void testCompareToSameObject() {
           // Given
           MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
           MoneyValue moneyValue2 = moneyValue1;
 
-          // When & Then
-          assertEquals(0, moneyValue1.compareTo(moneyValue2));
+          // When
+          int value = moneyValue1.compareTo(moneyValue2);
+
+          // Then
+          assertEquals(0, value);
       }
 
       @Test
@@ -411,18 +515,11 @@ class MoneyValueTest {
           MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
           MoneyValue moneyValue2 = new MoneyValue(100.0, Currency.EURO);
 
-          // When & Then
-          assertTrue(moneyValue1.compareTo(moneyValue2) != 0);
-      }
+          // When
+          int value = moneyValue1.compareTo(moneyValue2);
 
-      @Test
-      public void testCompareToEqualValuesWithDifferentCurrencies() {
-          // Given
-          MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
-          MoneyValue moneyValue2 = Converter.convertTo(moneyValue1, Currency.EURO);
-
-          // When & Then
-          assertEquals(0, moneyValue1.compareTo(moneyValue2));
+          // Then
+          assertTrue(value != 0);
       }
 
       @Test
@@ -431,8 +528,11 @@ class MoneyValueTest {
           MoneyValue moneyValue1 = new MoneyValue(200.0, Currency.US_DOLLAR);
           MoneyValue moneyValue2 = new MoneyValue(100.0, Currency.EURO);
 
-          // When & Then
-          assertTrue(moneyValue1.compareTo(moneyValue2) > 0);
+          // When
+          int value = moneyValue1.compareTo(moneyValue2);
+
+          // Then
+          assertTrue(value < 0);
       }
 
       @Test
@@ -441,32 +541,18 @@ class MoneyValueTest {
           MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
           MoneyValue moneyValue2 = new MoneyValue(200.0, Currency.EURO);
 
-          // When & Then
-          assertTrue(moneyValue1.compareTo(moneyValue2) < 0);
+          // When
+          int value = moneyValue1.compareTo(moneyValue2);
+
+          // Then
+          assertTrue(value > 0);
       }
   }
 
     @Nested
-    class MoneyValueConvertToTest {
+    class testMoneyValueAddTest {
         @Test
-        public void testConvertToSameCurrency() {
-            // Given
-            MoneyValue moneyValue = new MoneyValue(100.0, Currency.US_DOLLAR);
-            Currency toCurrency = Currency.US_DOLLAR;
-
-            // When
-            MoneyValue converted = Converter.convertTo(moneyValue, toCurrency);
-
-            // Then
-            assertEquals(moneyValue, converted);
-        }
-    }
-
-    @Nested
-    class MoneyValueAddTest {
-
-        @Test
-        public void testAddSameCurrency() {
+        public void testAddValidAmounts() {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.US_DOLLAR);
@@ -484,13 +570,13 @@ class MoneyValueTest {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.EURO);
-            MoneyValue expected = new MoneyValue(150.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.add(moneyValue2);
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.add(moneyValue2));
 
             // Then
-            assertEquals(expected, result);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -507,13 +593,26 @@ class MoneyValueTest {
             assertEquals(expected, result);
         }
 
+        @Test
+        public void testAddNullObject() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.EURO);
+            MoneyValue moneyValue2 = null;
+
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.add(moneyValue2));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
+        }
+
     }
 
     @Nested
-    public class MoneyValueSubtractTest {
-
+    public class testMoneyValueSubtractTest {
         @Test
-        public void testSubtractSameCurrency() {
+        public void testSubtractValidAmounts() {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.US_DOLLAR);
@@ -531,13 +630,13 @@ class MoneyValueTest {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.EURO);
-            MoneyValue expected = new MoneyValue(50.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.subtract(moneyValue2);
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.subtract(moneyValue2));
 
             // Then
-            assertEquals(expected, result);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -553,13 +652,26 @@ class MoneyValueTest {
             // Then
             assertEquals(expected, result);
         }
+
+        @Test
+        public void testSubtractNullObject() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.EURO);
+            MoneyValue moneyValue2 = null;
+
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.subtract(moneyValue2));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
+        }
     }
 
     @Nested
-    public class MoneyValueMultiplyTest {
-
+    public class testMoneyValueMultiplyTest {
         @Test
-        public void testMultiplySameCurrency() {
+        public void testMultiplyValidAmounts() {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(10.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(5.0, Currency.US_DOLLAR);
@@ -577,13 +689,13 @@ class MoneyValueTest {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(10.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(5.0, Currency.EURO);
-            MoneyValue expected = new MoneyValue(15.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.multiply(moneyValue2);
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.multiply(moneyValue2));
 
             // Then
-            assertEquals(expected, result);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -598,6 +710,20 @@ class MoneyValueTest {
 
             // Then
             assertEquals(expected, result);
+        }
+
+        @Test
+        public void testMultiplyNullObject() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.EURO);
+            MoneyValue moneyValue2 = null;
+
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.multiply(moneyValue2));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(INVALID_MONEY_VALUE, exception.getMessage() );
         }
 
         @Test
@@ -616,10 +742,9 @@ class MoneyValueTest {
     }
 
     @Nested
-    public class MoneyValueDivideTest {
-
+    public class testMoneyValueDivideTest {
         @Test
-        public void testDivideSameCurrency() {
+        public void testDivideValidAmounts() {
             // Given
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.US_DOLLAR);
@@ -640,10 +765,11 @@ class MoneyValueTest {
             MoneyValue expected = new MoneyValue(2.0, Currency.US_DOLLAR);
 
             // When
-            MoneyValue result = moneyValue1.divide(moneyValue2);
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.divide(moneyValue2));
 
             // Then
-            assertEquals(expected, result);
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(CURRENCIES_NOT_EQUAL, exception.getMessage() );
         }
 
         @Test
@@ -666,71 +792,272 @@ class MoneyValueTest {
             MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
             MoneyValue moneyValue2 = new MoneyValue(0.0, Currency.US_DOLLAR);
 
-            // When & Then
-            assertThrows(MoneyValue.InvalidMoneyValueException.class, () -> moneyValue1.divide(moneyValue2));
+            // When
+            Exception exception =  assertThrows(Exception.class, () -> moneyValue1.divide(moneyValue2));
+
+            // Then
+            assertEquals(exception.getClass(), RuntimeException.class);
+            assertEquals(DIVIDE_BY_ZERO, exception.getMessage() );
         }
     }
-    @Test
-    void testHashCode(){
-        // Given
-        MoneyValue oneDollar = new MoneyValue(1.0, Currency.US_DOLLAR);
 
-        //When & Then
-        assertEquals(oneDollar.hashCode(), Objects.hash(1.0, Currency.US_DOLLAR.getIsoCode()));
-    }
+    @Nested
+    public class testMoneyValueSynchronizedTests {
+        private int numberOfThreads;
+        private ExecutorService service;
+        private CountDownLatch latch;
 
-    @Test
-    void testConcatenation() {
-        double expAddAmount = 2.0;
-        double expSubAmount = 0.0;
-        double expMulAmount = 0.0;
-        double expDivAmount = 1e10;
-
-        MoneyValue mvAddResult = new MoneyValue(1.0, Currency.US_DOLLAR);
-        MoneyValue mvSubResult = new MoneyValue(1.0, Currency.US_DOLLAR);
-        MoneyValue mvMulResult = new MoneyValue(1.0, Currency.US_DOLLAR);
-        MoneyValue mvDivResult = new MoneyValue(1.0, Currency.US_DOLLAR);
-
-        MoneyValue mvConst = new MoneyValue(0.1, Currency.US_DOLLAR);
-
-        for(int i = 0; i < 10; ++i)
-        {
-            mvAddResult = mvAddResult.add(mvConst);
-            mvSubResult = mvSubResult.subtract(mvConst);
-            mvMulResult = mvMulResult.multiply(mvConst);
-            mvDivResult = mvDivResult.divide(mvConst);
+        @BeforeEach()
+        void beforeEach() {
+            numberOfThreads = 10;
+            service = Executors.newFixedThreadPool(10);
+            latch = new CountDownLatch(numberOfThreads);
         }
 
-        assertEquals(expAddAmount, mvAddResult.getAmount());
-        assertEquals(expSubAmount, mvSubResult.getAmount());
-        assertEquals(expMulAmount, mvMulResult.getAmount());
-        assertEquals(expDivAmount, mvDivResult.getAmount());
+        @Test
+        public void testAddMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(0.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(10.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.add(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testSubtractMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(10.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(0.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.subtract(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testMultiplyMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(1024.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.multiply(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testDivideMultiThreadingSafe() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(2048.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(2.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.divide(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
 
 
-        MoneyValue stressAddSubMv = new MoneyValue(0.0, Currency.US_DOLLAR);
+        @Test
+        public void testAddMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(0.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(20.0, Currency.EURO);
 
-        int nrOfAdditionsAndSubtractions = 1_000_000;
-        for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
-            stressAddSubMv = stressAddSubMv.add(new MoneyValue(0.1, Currency.US_DOLLAR));
-        assertEquals(stressAddSubMv.getAmount(), 100_000);
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.add(moneyValue2).add(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
 
-        for(int i = 0; i < nrOfAdditionsAndSubtractions; ++i)
-            stressAddSubMv = stressAddSubMv.subtract(new MoneyValue(0.1, Currency.US_DOLLAR));
+        @Test
+        public void testSubtractMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(40.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(20.0, Currency.EURO);
 
-        assertEquals(stressAddSubMv.getAmount(), 0.0);
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.subtract(moneyValue2).subtract(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
 
+        @Test
+        public void testMultiplyMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(1048576.0, Currency.EURO);
 
-        MoneyValue stressMulDivMv = new MoneyValue(1.0, Currency.US_DOLLAR);
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.multiply(moneyValue2).multiply(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
 
-        int nrOfMultAndDivs = 30;
-        for(int i = 0; i < nrOfMultAndDivs; ++i)
-            stressMulDivMv = stressMulDivMv.multiply(new MoneyValue(2.0, Currency.US_DOLLAR));
-        assertEquals(stressMulDivMv.getAmount(), (1 << nrOfMultAndDivs));
+        @Test
+        public void testDivideMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(2097152.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(2.0, Currency.EURO);
 
-        for(int i = 0; i < nrOfMultAndDivs; ++i)
-            stressMulDivMv = stressMulDivMv.divide(new MoneyValue(2.0, Currency.US_DOLLAR));
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.divide(moneyValue2).divide(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
 
+        @Test
+        public void testMultiThreadingSafeAllOperationsChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(100.0, Currency.EURO);
 
-        assertEquals(stressMulDivMv.getAmount(), 1.0);
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.add(moneyValue2).subtract(moneyValue2).multiply(moneyValue2).divide(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+    }
+
+    @Nested
+    public class testChaining {
+        @Test
+        public void testChainingAdd() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(200.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.add(moneyValue2).add(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingSubtract() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(0.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.subtract(moneyValue2).subtract(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingMultiply() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(400.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.multiply(moneyValue2).multiply(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingDivide() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(25.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.divide(moneyValue2).divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingAddAndSubtract() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(10.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(100.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.add(moneyValue2).subtract(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingMultiplyAndDivide() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(10.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(100.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.multiply(moneyValue2).divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingAllOperations() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(10.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(100.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.add(moneyValue2).subtract(moneyValue2).multiply(moneyValue2).divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
     }
 }

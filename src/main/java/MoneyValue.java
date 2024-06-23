@@ -8,15 +8,9 @@ import java.util.regex.Pattern;
 public final class MoneyValue implements MoneyValueClient {
     private BigDecimal amount;
     private final Currency currency;
-    public static final String INVALID_MONEY_VALUE_AS_STRING = "Invalid Money Value";
     private static final Pattern PATTERN_WITH_CURRENCY_FIRST = Pattern.compile("([$€¥£]|USD|EUR|JPY|GBP)?\\s*([\\d.,]+)");
     private static final Pattern PATTERN_WITH_AMOUNT_FIRST = Pattern.compile("([\\d.,]+)\\s*([$€¥£]|USD|EUR|JPY|GBP)?");
 
-    public static class InvalidMoneyValueException extends RuntimeException {
-        public InvalidMoneyValueException(String message) {
-            super(message);
-        }
-    }
 
     public MoneyValue(double v, Currency currency)  {
         this(new BigDecimal(v), currency);
@@ -26,19 +20,17 @@ public final class MoneyValue implements MoneyValueClient {
         this(new BigDecimal(v), currency);
     }
 
-
     public MoneyValue(BigDecimal amount, Currency currency) {
         if (amount == null || currency == null) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
         }
         this.amount = amount.setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
     }
   
     public MoneyValue(String str) {
-        if (str == null || str.isEmpty()) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
-        }
+        if (str == null || str.isEmpty())
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
 
         // First ISO then amount
         Matcher matcher = PATTERN_WITH_CURRENCY_FIRST.matcher(str);
@@ -50,7 +42,7 @@ public final class MoneyValue implements MoneyValueClient {
             // First amount then ISO
             matcher = PATTERN_WITH_AMOUNT_FIRST.matcher(str);
             if (!matcher.find()) {
-                throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+                throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
             }
             currencyStr = matcher.group(2);
             amountStr = matcher.group(1);
@@ -61,7 +53,7 @@ public final class MoneyValue implements MoneyValueClient {
 
         // Convert String to currency
         if (currencyStr == null || currencyStr.isEmpty()) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
         }
         Currency currency = currencyStr.length() == 3 ? Currency.fromIsoCode(currencyStr) : Currency.fromSymbol(currencyStr.charAt(0));
 
@@ -70,7 +62,7 @@ public final class MoneyValue implements MoneyValueClient {
         try {
             unroundedAmount = new BigDecimal(amountStr.replace(",", ""));
         } catch (NumberFormatException e) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
         }
 
         this.amount = unroundedAmount.setScale(2, RoundingMode.HALF_UP);
@@ -106,10 +98,18 @@ public final class MoneyValue implements MoneyValueClient {
     }
 
     public String toISOCode() {
+        String formattedAmount = this.amount.setScale(2, RoundingMode.HALF_UP).toString();
+        if (currency == Currency.EURO) {
+            return formattedAmount.replace(".", ",") + " " + currency.getIsoCode();
+        }
         return amount + " " + currency.getIsoCode();
     }
 
     public String toISOCodePrefix() {
+        String formattedAmount = this.amount.setScale(2, RoundingMode.HALF_UP).toString();
+        if (currency == Currency.EURO) {
+            return currency.getIsoCode() + " " + formattedAmount.replace(".", ",");
+        }
         return currency.getIsoCode() + " " + amount;
     }
 
@@ -143,7 +143,7 @@ public final class MoneyValue implements MoneyValueClient {
 
     synchronized public MoneyValue divide(MoneyValue other) {
         if (other.amount.compareTo(BigDecimal.ZERO) == 0) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.DIVIDE_BY_ZERO);
         }
         validateForOperation(this, other);
         setAmount(this.amount.divide(other.amount, 2, RoundingMode.HALF_UP));
@@ -152,16 +152,16 @@ public final class MoneyValue implements MoneyValueClient {
 
     private static void validateForOperation(MoneyValue a, MoneyValue b) {
         if (a == null || b == null) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
         } 
         if(!a.getCurrency().equals(b.getCurrency())){
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.CURRENCIES_NOT_EQUAL);
         }
     }
 
     private void setAmount(BigDecimal amount){
         if (amount == null) {
-            throw new InvalidMoneyValueException(INVALID_MONEY_VALUE_AS_STRING);
+            throw new RuntimeException(ConstErrorMessages.AMOUNT_NULL);
         }
         this.amount = amount.setScale(2, RoundingMode.HALF_UP);
     }
