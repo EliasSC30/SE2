@@ -394,7 +394,7 @@ class MoneyValueTest {
     }
 
     @Nested
-    class MoneyValueEqualsTest {
+    class testMoneyValueEqualsTest {
         @Test
         public void testEqualsSameObject() {
             // Given
@@ -439,7 +439,7 @@ class MoneyValueTest {
     }
 
     @Nested
-    class MoneyValueCompareToTest {
+    class testMoneyValueCompareToTest {
       @Test
       public void testCompareToSameObject() {
           // Given
@@ -494,7 +494,7 @@ class MoneyValueTest {
   }
 
     @Nested
-    class MoneyValueAddTest {
+    class testMoneyValueAddTest {
         @Test
         public void testAddValidAmounts() {
             // Given
@@ -554,7 +554,7 @@ class MoneyValueTest {
     }
 
     @Nested
-    public class MoneyValueSubtractTest {
+    public class testMoneyValueSubtractTest {
         @Test
         public void testSubtractValidAmounts() {
             // Given
@@ -613,7 +613,7 @@ class MoneyValueTest {
     }
 
     @Nested
-    public class MoneyValueMultiplyTest {
+    public class testMoneyValueMultiplyTest {
         @Test
         public void testMultiplyValidAmounts() {
             // Given
@@ -686,7 +686,7 @@ class MoneyValueTest {
     }
 
     @Nested
-    public class MoneyValueDivideTest {
+    public class testMoneyValueDivideTest {
         @Test
         public void testDivideValidAmounts() {
             // Given
@@ -746,7 +746,7 @@ class MoneyValueTest {
     }
 
     @Nested
-    public class MoneyValueSynchronizedTests {
+    public class testMoneyValueSynchronizedTests {
         private int numberOfThreads;
         private ExecutorService service;
         private CountDownLatch latch;
@@ -820,6 +820,188 @@ class MoneyValueTest {
             }
             latch.await();
             assertEquals(expectedResult, moneyValue1);
+        }
+
+
+        @Test
+        public void testAddMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(0.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(20.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.add(moneyValue2).add(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testSubtractMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(40.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(20.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.subtract(moneyValue2).subtract(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testMultiplyMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(1.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(1048576.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.multiply(moneyValue2).multiply(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testDivideMultiThreadingSafeChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(2097152.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(2.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.divide(moneyValue2).divide(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+
+        @Test
+        public void testMultiThreadingSafeAllOperationsChaining() throws InterruptedException {
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.EURO);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.EURO);
+            MoneyValue expectedResult = new MoneyValue(100.0, Currency.EURO);
+
+            for (int i = 0; i < numberOfThreads; i++) {
+                service.submit(() -> {
+                    moneyValue1.add(moneyValue2).subtract(moneyValue2).multiply(moneyValue2).divide(moneyValue2);
+                    latch.countDown();
+                });
+            }
+            latch.await();
+            assertEquals(expectedResult, moneyValue1);
+        }
+    }
+
+    @Nested
+    public class testChaining {
+        @Test
+        public void testChainingAdd() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(200.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.add(moneyValue2).add(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingSubtract() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(50.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(0.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.subtract(moneyValue2).subtract(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingMultiply() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(400.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.multiply(moneyValue2).multiply(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingDivide() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(2.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(25.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.divide(moneyValue2).divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingAddAndSubtract() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(10.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(100.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.add(moneyValue2).subtract(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingMultiplyAndDivide() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(10.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(100.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.multiply(moneyValue2).divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
+        }
+
+        @Test
+        public void testChainingAllOperations() {
+            // Given
+            MoneyValue moneyValue1 = new MoneyValue(100.0, Currency.US_DOLLAR);
+            MoneyValue moneyValue2 = new MoneyValue(10.0, Currency.US_DOLLAR);
+            MoneyValue expected = new MoneyValue(100.0, Currency.US_DOLLAR);
+
+            // When
+            moneyValue1.add(moneyValue2).subtract(moneyValue2).multiply(moneyValue2).divide(moneyValue2);
+
+            // Then
+            assertEquals(expected, moneyValue1);
         }
     }
 }
