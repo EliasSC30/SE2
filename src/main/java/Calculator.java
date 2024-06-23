@@ -16,13 +16,13 @@ public class Calculator {
 
     public MoneyValueClient getMoneyValueClient() { return this.mv_; }
     public ConverterClient getConverterClient() { return this.cv_; }
-    public void setMoneyValue(MoneyValue mv) {
+    synchronized public void setMoneyValue(MoneyValue mv) {
         if(mv == null)
             throw new RuntimeException(ConstErrorMessages.MONEY_VALUE_NULL);
         this.mv_ = mv;
     }
 
-     public void setConverter(Converter cv) {
+     synchronized public void setConverter(Converter cv) {
         if(cv == null)
             throw new RuntimeException(ConstErrorMessages.CONVERTER_NULL);
         this.cv_ = cv;
