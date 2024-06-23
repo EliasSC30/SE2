@@ -14,6 +14,10 @@ public class CurrencyFormatter {
         return customFormat.format(mv.getAmount());
     }
 
+    public static String formatISOCode(MoneyValue mv){
+        return formatISOCode(mv, Locale.getDefault());
+    }
+
     public static String formatISOCode(MoneyValue mv, Locale locale) {
         NumberFormat nfJustNumber = NumberFormat.getNumberInstance(locale);
         nfJustNumber.setRoundingMode(RoundingMode.HALF_UP);

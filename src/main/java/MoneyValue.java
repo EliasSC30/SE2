@@ -79,11 +79,7 @@ public final class MoneyValue implements MoneyValueClient {
 
     @Override
     public String toString() {
-        String formattedAmount = this.amount.setScale(2, RoundingMode.HALF_UP).toString();
-        if (currency == Currency.EURO) {
-            return formattedAmount.replace(".", ",") + " " + currency.getSymbol();
-        }
-        return currency.getSymbol() + " " + formattedAmount;
+        return CurrencyFormatter.formatCurrency(this);
     }
 
     @Override
@@ -98,20 +94,9 @@ public final class MoneyValue implements MoneyValueClient {
     }
 
     public String toISOCode() {
-        String formattedAmount = this.amount.setScale(2, RoundingMode.HALF_UP).toString();
-        if (currency == Currency.EURO) {
-            return formattedAmount.replace(".", ",") + " " + currency.getIsoCode();
-        }
-        return amount + " " + currency.getIsoCode();
+        return CurrencyFormatter.formatISOCode(this);
     }
 
-    public String toISOCodePrefix() {
-        String formattedAmount = this.amount.setScale(2, RoundingMode.HALF_UP).toString();
-        if (currency == Currency.EURO) {
-            return currency.getIsoCode() + " " + formattedAmount.replace(".", ",");
-        }
-        return currency.getIsoCode() + " " + amount;
-    }
 
     public int compareTo(MoneyValue other) {
         if(this == other) return 0;
