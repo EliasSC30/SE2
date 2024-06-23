@@ -57,16 +57,73 @@ public final class MoneyValue implements MoneyValueClient {
         }
         Currency currency = currencyStr.length() == 3 ? Currency.fromIsoCode(currencyStr) : Currency.fromSymbol(currencyStr.charAt(0));
 
-        // Convert String to amount
         BigDecimal unroundedAmount;
         try {
-            unroundedAmount = new BigDecimal(amountStr.replace(",", ""));
+            String cleanedAmount = cleanAmount(amountStr);
+            String rightFormatAmount = cleanedAmount.replace(",", ".");
+            unroundedAmount = new BigDecimal(rightFormatAmount);
         } catch (NumberFormatException e) {
             throw new RuntimeException(ConstErrorMessages.INVALID_MONEY_VALUE_AS_STRING);
         }
 
         this.amount = unroundedAmount.setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
+    }
+
+    private static String cleanAmount(String amountStr) {
+        String cleanedAmount = amountStr.replaceAll("[^0-9,.]", "");
+        int dotCount = countChar(amountStr, '.');
+        int commaCount = countChar(amountStr, ',');
+
+        if (dotCount == 0 && commaCount == 0) {
+            return cleanedAmount;
+        }
+
+        if (dotCount > 1) {
+            cleanedAmount = cleanedAmount.replace(".", "");
+            return cleanedAmount;
+        } else if (commaCount > 1) {
+            cleanedAmount = cleanedAmount.replace(",", "");
+            return cleanedAmount;
+        }
+
+        int lastNonDigitIndex = getLastNonDigitIndex(amountStr);
+        if (commaCount == 1 && dotCount == 1 && lastNonDigitIndex != -1) {
+            char lastNonDigit = amountStr.charAt(lastNonDigitIndex);
+            if (lastNonDigit == ',') {
+                cleanedAmount = cleanedAmount.replace(".", "");
+            } else if (lastNonDigit == '.') {
+                cleanedAmount = cleanedAmount.replace(",", "");
+            }
+            return cleanedAmount;
+        }
+
+        if (dotCount == 1) {
+            int dotIndex = amountStr.indexOf('.');
+            if (amountStr.length() - dotIndex > 3) {
+                cleanedAmount = cleanedAmount.replace(".", "");
+            }
+        } else if (commaCount == 1) {
+            int commaIndex = amountStr.indexOf(',');
+            if (amountStr.length() - commaIndex > 3) {
+                cleanedAmount = cleanedAmount.replace(",", "");
+            }
+        }
+
+        return cleanedAmount;
+    }
+
+    private static int getLastNonDigitIndex(String amountStr) {
+        for (int i = amountStr.length() - 1; i >= 0; i--) {
+            if (!Character.isDigit(amountStr.charAt(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static int countChar(String str, char ch) {
+        return (int) str.chars().filter(c -> c == ch).count();
     }
 
     public Currency getCurrency() {

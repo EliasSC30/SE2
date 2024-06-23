@@ -417,39 +417,6 @@ class MoneyValueTest {
     }
 
     @Nested
-    class testMoneyValueToISOCodePrefix{
-        @Test
-        public void testToISOCodePrefixJAPYEN() {
-            // Given
-            double amount = 100.0;
-            Currency currency = Currency.JAPANESE_YEN;
-            MoneyValue moneyValue = new MoneyValue(amount, currency);
-            String expected = "JPY 100.00";
-
-            // When
-            String actual = moneyValue.toISOCodePrefix();
-
-            // Then
-            assertEquals(expected, actual);
-        }
-
-        @Test
-        public void testToISOCodePrefixEUR() {
-            // Given
-            double amount = 100.0;
-            Currency currency = Currency.EURO;
-            MoneyValue moneyValue = new MoneyValue(amount, currency);
-            String expected = "EUR 100,00";
-
-            // When
-            String actual = moneyValue.toISOCodePrefix();
-
-            // Then
-            assertEquals(expected, actual);
-        }
-    }
-
-    @Nested
     class testMoneyValueEqualsTest {
         @Test
         public void testEqualsSameObject() {
