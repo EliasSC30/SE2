@@ -86,8 +86,7 @@ class FixedExchangeRateProviderTest {
         Exception exception = assertThrows(Exception.class, () -> exchangeRateProvider.getExchangeRate(from, to, exchangeRateType));
 
         // Then
-        assertEquals(exception.getClass(), RuntimeException.class);
-        assertEquals("ExchangeRateType can not be null", exception.getMessage());
+        assertEquals(NullPointerException.class, exception.getClass());
     }
 
     @Test
@@ -101,8 +100,7 @@ class FixedExchangeRateProviderTest {
         Exception exception = assertThrows(Exception.class, () -> exchangeRateProvider.getExchangeRate(from, to, exchangeRateType));
 
         // Then
-        assertEquals(exception.getClass(), RuntimeException.class);
-        assertEquals("Currency can not be null", exception.getMessage());
+        assertEquals(exception.getClass(), NullPointerException.class);
     }
 
     @Test
@@ -116,7 +114,6 @@ class FixedExchangeRateProviderTest {
         Exception exception = assertThrows(Exception.class, () -> exchangeRateProvider.getExchangeRate(from, to, exchangeRateType));
 
         // Then
-        assertEquals(exception.getClass(), RuntimeException.class);
-        assertEquals("Currency can not be null", exception.getMessage());
+        assertEquals(exception.getClass(), NullPointerException.class);
     }
 }
