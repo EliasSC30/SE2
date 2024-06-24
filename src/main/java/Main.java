@@ -1,29 +1,30 @@
+import javax.swing.text.html.MinimalHTMLWriter;
+
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        Converter cv = new Converter(new ExchangeRateProvider() {
-            @Override
-            public Double getExchangeRate(Currency from, Currency to, ExchangeRateType type) {
-                return 1.0;
-            }
-        });
+        Converter cv = new Converter(new FixedExchangeRateProvider());
 
-        Calculator c = new Calculator(new MoneyValue("100$"), cv);
-        MoneyValue oneDollar = new MoneyValue(1.0, Currency.US_DOLLAR);
-        MoneyValue twoDollar = new MoneyValue(2.0, Currency.US_DOLLAR);
+        MoneyValue mv1 = new MoneyValue(1, Currency.US_DOLLAR);
+        MoneyValue mv2 = new MoneyValue("2 $");
+        MoneyValue mv3 = new MoneyValue("3 EUR");
 
-        System.out.println(c.getMoneyValueClient());
-        c.add(oneDollar);
-        System.out.println(c.getMoneyValueClient());
-        c.add(oneDollar).add(oneDollar);
-        System.out.println(c.getMoneyValueClient());
-        c.add(oneDollar).subtract(oneDollar);
-        System.out.println(c.getMoneyValueClient());
-        c.multiply(twoDollar);
-        System.out.println(c.getMoneyValueClient());
-        c.divide(twoDollar);
-        System.out.println(c.getMoneyValueClient());
-        c.multiply(twoDollar).divide(twoDollar).add(twoDollar).subtract(twoDollar);
+        System.out.println(mv1);
+
+        mv1.add(mv2);
+
+        System.out.println(mv1);
+
+        Calculator c = new Calculator(mv1, cv);
+
+        c.add(mv3);
+
         System.out.println(c.getMoneyValueClient());
 
+        MoneyValue mv4 = new MoneyValue("USD 1");
+        MoneyValue mv5 = new MoneyValue("$ 2.0");
+
+        mv4.add(mv5).subtract(mv5).multiply(mv5).divide(mv5);
+
+        System.out.println(mv4);
     }
 }
