@@ -139,6 +139,16 @@ public final class MoneyValue implements MoneyValueClient {
         return CurrencyFormatter.formatCurrency(this);
     }
 
+    public String toStringAmount() {
+        return amount.toString();
+    }
+    public String toStringCurrencySymbol() {
+        return currency.getSymbol();
+    }
+    public String toStringCurrencyISOCode() {
+        return currency.getIsoCode();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
